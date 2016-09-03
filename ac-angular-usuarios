@@ -1,0 +1,62 @@
+<div id="lista">
+    <input type="text" class="buscador">
+    <table>
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="row in listadoProductosCtrl.productos | filter:listadoProductosCtrl.filtro | limitTo:listadoProductosCtrl.end:listadoProductosCtrl.start"
+            ac-last-list-item ng-click="listadoProductosCtrl.detalle(row.producto_id)">
+            <td class="">{{row.nombre}}</td>
+            <td class="">{{row.apellido}}</td>
+            <td class="">{{row.email}}</td>
+            <td class="">{{row.telefono}}</td>
+        </tr>
+    </table>
+</div>
+<div id="detalle">
+    <form class="form" form-id="usuario-details">
+        <div class="input">
+            <input id="nombre" type="text" ac-validator
+                   is-required="{{'ERROR_REQUIRED' | xlat:{campo:('NAME'|xlat)} }}"/>
+            <span>Texto de etiqueta</span>
+        </div>
+        <div class="input">
+            <input id="apellido" type="text" ac-validator [val-value]=""/>
+            <span>Texto de etiqueta</span>
+        </div>
+        <div class="input">
+            <input id="email" type="email" ac-validator [val-value]=""/>
+            <span>Texto de etiqueta</span>
+        </div>
+        <div class="input">
+            <input id="telefono" type="text" ac-validator [val-value]=""/>
+            <span>Texto de etiqueta</span>
+        </div>
+        <div class="input">
+            <input id="direccion" type="text" ac-validator [val-value]=""/>
+            <span>Texto de etiqueta</span>
+        </div>
+        <div class="input">
+            <input id="tipo_doc" type="text/date/number/email" ac-validator [val-value]=""/>
+            <span>Texto de etiqueta</span>
+        </div>
+        <div class="input">
+            <input id="nro_doc" type="text/date/number/email" ac-validator [val-value]=""/>
+            <span>Texto de etiqueta</span>
+        </div>
+        <div class="input">
+            <input id="activo" type="text/date/number/email" ac-validator [val-value]=""/>
+            <span>Texto de etiqueta</span>
+        </div>
+    </form>
+
+</div>
+<div id="botonera">
+
+</div>

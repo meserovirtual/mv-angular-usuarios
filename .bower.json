@@ -1,0 +1,14 @@
+{
+  "name": "ac-angular-usuarios",
+  "homepage": "https://github.com/arielcessario/ac-angular-usuarios",
+  "_release": "f7cd607f7f",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "f7cd607f7f99e43c345173b1d887308423c7869e"
+  },
+  "_source": "https://github.com/arielcessario/ac-angular-usuarios.git",
+  "_target": "*",
+  "_originalSource": "ac-angular-usuarios",
+  "_direct": true
+}

@@ -1,0 +1,24 @@
+2016-04-25 00:07:26: exception 'Exception' with message 'Problem preparing query (SELECT  * FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = siro) Unknown column 'siro' in 'where clause'' in C:\xampp\htdocs\gestion-bayres\app\includes\MysqliDb.php:1482
+Stack trace:
+#0 C:\xampp\htdocs\gestion-bayres\app\includes\MysqliDb.php(382): MysqliDb->_prepareQuery()
+#1 C:\xampp\htdocs\gestion-bayres\app\bower_components\ac-angular-usuarios\includes\ac-usuarios.php(277): MysqliDb->rawQuery('SELECT  * FROM ...')
+#2 [internal function]: Usuarios::login(Array)
+#3 C:\xampp\htdocs\gestion-bayres\app\bower_components\ac-angular-usuarios\includes\ac-usuarios.php(26): call_user_func('Usuarios::login', Array)
+#4 C:\xampp\htdocs\gestion-bayres\app\bower_components\ac-angular-usuarios\includes\ac-usuarios.php(621): Usuarios::init(Array)
+#5 {main}
+2016-04-25 00:40:19: exception 'Exception' with message 'Problem preparing query (SELECT  usuario_id, * FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = "arielcessario@gmail.com") You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '* FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  ma' at line 1' in C:\xampp\htdocs\gestion-bayres\app\includes\MysqliDb.php:1482
+Stack trace:
+#0 C:\xampp\htdocs\gestion-bayres\app\includes\MysqliDb.php(382): MysqliDb->_prepareQuery()
+#1 C:\xampp\htdocs\gestion-bayres\app\bower_components\ac-angular-usuarios\includes\ac-usuarios.php(277): MysqliDb->rawQuery('SELECT  usuario...')
+#2 [internal function]: Usuarios::login(Array)
+#3 C:\xampp\htdocs\gestion-bayres\app\bower_components\ac-angular-usuarios\includes\ac-usuarios.php(26): call_user_func('Usuarios::login', Array)
+#4 C:\xampp\htdocs\gestion-bayres\app\bower_components\ac-angular-usuarios\includes\ac-usuarios.php(623): Usuarios::init(Array)
+#5 {main}
+2016-04-25 00:44:29: exception 'Exception' with message 'Problem preparing query (SELECT usuario_id, nombre, apellido, mail, rol_id, password, tipo_doc, nro_doc, marcado, saldo FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = "arielcessario@gmail.com") Column 'usuario_id' in field list is ambiguous' in C:\xampp\htdocs\gestion-bayres\app\includes\MysqliDb.php:1482
+Stack trace:
+#0 C:\xampp\htdocs\gestion-bayres\app\includes\MysqliDb.php(382): MysqliDb->_prepareQuery()
+#1 C:\xampp\htdocs\gestion-bayres\app\bower_components\ac-angular-usuarios\includes\ac-usuarios.php(277): MysqliDb->rawQuery('SELECT usuario_...')
+#2 [internal function]: Usuarios::login(Array)
+#3 C:\xampp\htdocs\gestion-bayres\app\bower_components\ac-angular-usuarios\includes\ac-usuarios.php(26): call_user_func('Usuarios::login', Array)
+#4 C:\xampp\htdocs\gestion-bayres\app\bower_components\ac-angular-usuarios\includes\ac-usuarios.php(624): Usuarios::init(Array)
+#5 {main}

@@ -1,0 +1,53 @@
+<div class="input">
+    <input id="nombre" type="text" ng-model="$ctrl.usuario.nombre" ac-validator
+           is-required="{{'ERROR_REQUIRED' | xlat:{campo:('NAME'|xlat)} }}" autocomplete="off"/>
+    <span>{{'NAME'|xlat}}</span>
+</div>
+<div class="input">
+    <input id="apellido" type="text" ng-model="$ctrl.usuario.apellido" ac-validator
+           is-required="{{'ERROR_REQUIRED' | xlat:{campo:('LAST_NAME'|xlat)} }}" autocomplete="off"/>
+    <span>{{'LAST_NAME'|xlat}}</span>
+</div>
+<div class="input">
+    <input id="email" type="email" ng-model="$ctrl.usuario.mail" ac-validator
+           is-required="{{'ERROR_REQUIRED' | xlat:{campo:('EMAIL'|xlat)} }}"
+           autocomplete="off"/>
+    <span>{{'EMAIL'|xlat}}</span>
+</div>
+<div class="input">
+    <input id="telefono" type="text" ng-model="$ctrl.usuario.telefono"
+           autocomplete="off"/>
+    <span>{{'PHONE'|xlat}}</span>
+</div>
+<div class="input">
+    <input id="direccion" type="text" ng-model="$ctrl.usuario.direcciones[0].calle" ac-validator
+           autocomplete="off"/>
+    <span>{{'ADDRESS'|xlat}}</span>
+</div>
+<div class="input">
+    <select id="tipo_doc" ac-validator ng-model="$ctrl.usuario.tipo_doc"
+            is-required="{{'ERROR_REQUIRED' | xlat:{campo:('DOC_TYPE'|xlat)} }}">
+        <option value="0" selected>DNI</option>
+        <option value="1">CUIT</option>
+        <option value="2">PASS</option>
+        <option value="3">CI</option>
+        <option value="4">Otro</option>
+    </select>
+    <span>{{'DOC_TYPE'|xlat}}</span>
+</div>
+<div class="input">
+    <input id="nro_doc" type="text" ng-model="$ctrl.usuario.nro_doc"
+           autocomplete="off"/>
+    <span>{{'DOC_NO' | xlat}}</span>
+</div>
+<div class="input">
+    <select name="perfil" id="perfil" ng-model="$ctrl.usuario.rol_id">
+        <option value="3">Cliente</option>
+        <option value="4">Mayorista</option>
+    </select>
+    <label for="perfil">Perfil</label>
+</div>
+<div class="botonera">
+    <button ng-click="$ctrl.save(); $ctrl.detailsOpen = false;" ac-validator>{{'SAVE'|xlat}}</button>
+</div>
+

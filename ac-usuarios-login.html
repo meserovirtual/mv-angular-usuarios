@@ -1,0 +1,37 @@
+<form form-id="ac-usuarios-login" class="form login-iconos">
+    <div class="detalle-container-login">
+        <div class="input">
+            <input type="text" id="ac-usuarios-login-email" ng-model="$ctrl.email" ac-validator
+                   is-required="{{'ERROR_REQUIRED' | xlat:{campo:('NAME'|xlat)} }}" autocomplete="off">
+            <span>{{'EMAIL'|xlat}}</span>
+        </div>
+
+        <div class="input">
+            <input type="password" id="ac-usuarios-login-password" ng-model="$ctrl.password" autocomplete="off" ac-validator
+                   is-required="{{'ERROR_REQUIRED' | xlat:{campo:('NAME'|xlat)} }}">
+            <span>{{'PASSWORD'|xlat}}</span>
+        </div>
+        <div class="input" ng-if="$ctrl.showSucursales != undefined">
+            <select name="" id="sucursales" ng-model="$ctrl.sucursal"
+                    ng-options="opt.nombre for opt in $ctrl.sucursales" ng-change="$ctrl.caja = $ctrl.sucursal.cajas[0]"></select>
+            <span>{{'BRANCH'|xlat}}</span>
+        </div>
+        <div class="input" ng-if="$ctrl.showCajas != undefined">
+            <select name="" id="cajas" ng-model="$ctrl.caja"
+                    ng-options="opt.nombre for opt in $ctrl.sucursal.cajas"></select>
+            <span>{{'f'|xlat}}</span>
+        </div>
+    </div>
+    <div class="botonera">
+        <button ac-validator ng-click="$ctrl.login()">{{'LOGIN' | xlat}}</button>
+    </div>
+    <div class="social" ng-if="$ctrl.social">
+        <span>o</span>
+        <button id="facebook" ng-click="$ctrl.loginFacebook()"></button>
+        <button id="google" ng-click="$ctrl.loginGoogle()"></button>
+    </div>
+    <div class="register" ng-if="$ctrl.register">
+        <span>o</span>
+        <a ng-href="$ctrl.registrarse">{{'REGISTER' | xlat}}</a>
+    </div>
+</form>

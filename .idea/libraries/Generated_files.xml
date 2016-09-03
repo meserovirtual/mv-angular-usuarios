@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="Generated files" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/ac-usuarios-administracion.min.js" />
+        <item url="file://$PROJECT_DIR$/ac-usuarios.min.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/ac-usuarios.min.min.js" />
+      <root url="file://$PROJECT_DIR$/ac-usuarios-administracion.min.js" />
+      <root url="file://$PROJECT_DIR$/ac-usuarios.min.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>
