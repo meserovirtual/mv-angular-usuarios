@@ -215,8 +215,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
      */
     function remove($params)
     {
-
-        $db = new MysqliDb();
+        $db = self::$instance->db;
 
         $db->where("usuario_id", $params["usuario_id"]);
         $results = $db->delete('usuarios');
@@ -238,9 +237,14 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
      * @description: Obtiene todos los usuario con sus direcciones.
      * todo: Sacar dirección y crear sus propias clases dentro de este mismo módulo.
      */
-    function get()
+    function get($params)
     {
-        $db = self::$instance->db;
+
+        //$db = self::$instance->db;
+        //if($params["all"] == "false")
+        //    $db->where("status", 1);
+        /*
+        $db->where("rol_id",$params["rol_id"]);
         $results = $db->get('usuarios');
 
         foreach ($results as $key => $row) {
@@ -257,6 +261,108 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
 
         echo json_encode($results);
 //        echo json_encode($res);
+*/
+
+
+        $db = self::$instance->db;
+        $results = $db->rawQuery('SELECT
+                                    u.usuario_id,
+                                    u.nombre,
+                                    u.apellido,
+                                    u.mail,
+                                    u.nacionalidad_id,
+                                    u.tipo_doc,
+                                    u.nro_doc,
+                                    u.comentarios,
+                                    u.marcado,
+                                    u.telefono,
+                                    u.fecha_nacimiento,
+                                    u.profesion_id,
+                                    u.saldo,
+                                    u.password,
+                                    u.rol_id,
+                                    u.news_letter,
+                                    u.cbu,
+                                    u.social_login,
+                                    u.status,
+                                    u.cta_cte,
+                                    d.direccion_id,
+                                    d.calle,
+                                    d.nro,
+                                    d.piso,
+                                    d.puerta,
+                                    d.ciudad_id
+                                FROM usuarios u LEFT JOIN direcciones d ON d.usuario_id = u.usuario_id
+                                WHERE u.rol_id IN (' . $params["rol_id"] . ') ORDER BY u.apellido, u.nombre');
+
+        $final = array();
+        foreach ($results as $row) {
+
+            if (!isset($final[$row["usuario_id"]])) {
+                $final[$row["usuario_id"]] = array(
+                    'usuario_id' => $row["usuario_id"],
+                    'nombre' => $row["nombre"],
+                    'apellido' => $row["apellido"],
+                    'mail' => $row["mail"],
+                    'nacionalidad_id' => $row["nacionalidad_id"],
+                    'tipo_doc' => $row["tipo_doc"],
+                    'nro_doc' => $row["nro_doc"],
+                    'comentarios' => $row["comentarios"],
+                    'marcado' => $row["marcado"],
+                    'telefono' => $row["telefono"],
+                    'fecha_nacimiento' => $row["fecha_nacimiento"],
+                    'profesion_id' => $row["profesion_id"],
+                    'saldo' => $row["saldo"],
+                    //'password' => $row["password"],
+                    'password' => '',
+                    'rol_id' => $row["rol_id"],
+                    'news_letter' => $row["news_letter"],
+                    'cbu' => $row["cbu"],
+                    'social_login' => $row["social_login"],
+                    'status' => $row["status"],
+                    'cta_cte' => $row["cta_cte"],
+                    'direcciones' => array()
+                );
+            }
+
+            $have_dir = false;
+            if ($row["direccion_id"] !== null) {
+
+                if (sizeof($final[$row['usuario_id']]['direcciones']) > 0) {
+                    foreach ($final[$row['usuario_id']]['direcciones'] as $cat) {
+                        if ($cat['direccion_id'] == $row["direccion_id"]) {
+                            $have_dir = true;
+                        }
+                    }
+                } else {
+                    $final[$row['usuario_id']]['direcciones'][] = array(
+                        'direccion_id' => $row['direccion_id'],
+                        'calle' => $row['calle'],
+                        'nro' => $row['nro'],
+                        'piso' => $row['piso'],
+                        'puerta' => $row['puerta'],
+                        'ciudad_id' => $row['ciudad_id']
+                    );
+
+                    $have_dir = true;
+                }
+
+                if (!$have_dir) {
+                    array_push($final[$row['usuario_id']]['direcciones'], array(
+                        'direccion_id' => $row['direccion_id'],
+                        'calle' => $row['calle'],
+                        'nro' => $row['nro'],
+                        'piso' => $row['piso'],
+                        'puerta' => $row['puerta'],
+                        'ciudad_id' => $row['ciudad_id']
+                    ));
+                }
+            }
+
+        }
+
+        echo json_encode(array_values($final));
+
     }
 
     /* @name: login
@@ -274,7 +380,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
 //        $db->join("direcciones d", "d.usuario_id=u.usuario_id", "LEFT");
 //        $results = $db->get("usuarios u");
 
-        $results = $db->rawQuery('SELECT u.usuario_id, u.nombre, apellido, mail, rol_id, password, tipo_doc, nro_doc, marcado, saldo, social_login FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = "' . $params['mail'] . '"');
+        $results = $db->rawQuery('SELECT u.usuario_id, u.nombre, apellido, mail, rol_id, password, tipo_doc, nro_doc, marcado, saldo, social_login, status FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = "' . $params['mail'] . '"');
 
 
         global $jwt_enabled;
@@ -293,17 +399,22 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                 // Si la seguridad se encuentra habilitada, retorna el token y el usuario sin password
                 //$results[0]->sucursal = $sucursal_id; //-1 == web
                 //Comente la linea de arriba xq me saltaba error.
-                if ($jwt_enabled) {
-                    echo json_encode(
-                        array(
-                            'token' => self::createToken($results[0], $params['sucursal_id'], $params['caja_id']),
-                            'user' => $results[0])
-                    );
+                if($results[0]['status'] == 0) {
+                    self::addLogin($results[0]['usuario_id'], $params["sucursal_id"], $params["caja_id"], 0);
+                    header('HTTP/1.0 500 Internal Server Error');
+                    echo "Usuario inhabilitado";
                 } else {
-                    echo json_encode(array('token' => '', 'user' => $results[0]));
+                    if ($jwt_enabled) {
+                        echo json_encode(
+                            array(
+                                'token' => self::createToken($results[0], $params['sucursal_id'], $params['caja_id']),
+                                'user' => $results[0])
+                        );
+                    } else {
+                        echo json_encode(array('token' => '', 'user' => $results[0]));
+                    }
+                    self::addLogin($results[0]['usuario_id'], $params["sucursal_id"], $params["caja_id"], 1);
                 }
-                self::addLogin($results[0]['usuario_id'], $params["sucursal_id"], $params["caja_id"], 1);
-
             } else {
                 self::addLogin($results[0]['usuario_id'], $params["sucursal_id"], $params["caja_id"], 0);
                 header('HTTP/1.0 500 Internal Server Error');
@@ -386,59 +497,133 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
     function create($params)
     {
         $db = self::$instance->db;
-        $db->startTransaction();
         $user_decoded = self::checkUsuario(json_decode($params["user"]));
-        $options = ['cost' => 12];
-        $password = password_hash($user_decoded->password, PASSWORD_BCRYPT, $options);
+        $error = false;
+        $error_code = 0;
+        $message = '';
 
-        $data = array(
-            'nombre' => $user_decoded->nombre,
-            'apellido' => $user_decoded->apellido,
-            'mail' => $user_decoded->mail,
-            'nacionalidad_id' => $user_decoded->nacionalidad_id,
-            'tipo_doc' => $user_decoded->tipo_doc,
-            'nro_doc' => $user_decoded->nro_doc,
-            'comentarios' => $user_decoded->comentarios,
-            'marcado' => $user_decoded->marcado,
-            'telefono' => $user_decoded->telefono,
-            'fecha_nacimiento' => $user_decoded->fecha_nacimiento,
-            'profesion_id' => $user_decoded->profesion_id,
-            'saldo' => $user_decoded->saldo,
-            'password' => $password,
-            'rol_id' => $user_decoded->rol_id,
-            'news_letter' => $user_decoded->news_letter,
-            'cbu' => $user_decoded->cbu,
-            'social_login' => $user_decoded->social_login,
-        );
+        if($user_decoded->nro_doc != "") {
+            $SQL = 'Select usuario_id from usuarios where nro_doc ="' . $user_decoded->nro_doc . '"';
 
-        $result = $db->insert('usuarios', $data);
-        if ($result > -1) {
+            //$result = $db->rawQuery($SQL);
+            $db->rawQuery($SQL);
+            if ($db->count > 0) {
+                //header('HTTP/1.0 500 Internal Server Error');
+                //echo json_encode(1, 'Existe un usuario con el DNI o CUIT ingresado');
+                //return;
+                //echo json_encode(1);
+                $error_code = 1;
+                $message = 'Existe un usuario con el DNI o CUIT ingresado';
+                $error = true;
+            }
+        }
+
+        if(!$error) {
+            if($user_decoded->mail != "") {
+                $SQL = 'Select usuario_id from usuarios where mail ="' . $user_decoded->mail . '"';
+                //$result = $db->rawQuery($SQL);
+                $db->rawQuery($SQL);
+                if ($db->count > 0) {
+                    //header('HTTP/1.0 500 Internal Server Error');
+                    //echo json_encode(2, 'Existe un usuario con el Mail ingresado');
+                    //return;
+                    //echo json_encode(2);
+                    //$error_code = 2;
+                    $message = 'Existe un usuario con el Mail ingresado';
+                    $error = true;
+                }
+            }
+        }
+
+        if(!$error) {
+            $db = self::$instance->db;
+            $db->startTransaction();
+            $user_decoded = self::checkUsuario(json_decode($params["user"]));
+
+            $options = ['cost' => 12];
+            $password = password_hash($user_decoded->password, PASSWORD_BCRYPT, $options);
 
             $data = array(
-                'usuario_id' => $result,
-                'calle' => $user_decoded->calle,
-                'nro' => $user_decoded->nro,
-                'piso' => $user_decoded->piso,
-                'puerta' => $user_decoded->puerta,
-                'ciudad_id' => $user_decoded->ciudad_id
+                'nombre' => $user_decoded->nombre,
+                'apellido' => $user_decoded->apellido,
+                'mail' => $user_decoded->mail,
+                'nacionalidad_id' => $user_decoded->nacionalidad_id,
+                'tipo_doc' => $user_decoded->tipo_doc,
+                'nro_doc' => $user_decoded->nro_doc,
+                'comentarios' => $user_decoded->comentarios,
+                'marcado' => $user_decoded->marcado,
+                'telefono' => $user_decoded->telefono,
+                'fecha_nacimiento' => $user_decoded->fecha_nacimiento,
+                'profesion_id' => $user_decoded->profesion_id,
+                'saldo' => $user_decoded->saldo,
+                'password' => $password,
+                'rol_id' => $user_decoded->rol_id,
+                'news_letter' => $user_decoded->news_letter,
+                'cbu' => $user_decoded->cbu,
+                'social_login' => $user_decoded->social_login,
+                'status' => $user_decoded->status,
+                'cta_cte' => $user_decoded->cta_cte
             );
 
-            $dir = $db->insert('direcciones', $data);
+            $result = $db->insert('usuarios', $data);
+            if ($result > -1) {
 
-            if ($dir > -1) {
-                $db->commit();
-                header('HTTP/1.0 200 Ok');
-                echo json_encode($result);
+                foreach ($user_decoded->direcciones as $direccion) {
+                    if (!self::createDirecciones($direccion, $result, $db)) {
+                        $db->rollback();
+                        //header('HTTP/1.0 500 Internal Server Error');
+                        //echo $db->getLastError();
+                        //return;
+                        //echo json_encode(3);
+                        $message = 'Error guardando la dirección';
+                        $error = true;
+                    }
+                }
+
+                if($error) {
+                    $db->rollback();
+                    header('HTTP/1.0 500 Internal Server Error');
+                } else {
+                    $db->commit();
+                    header('HTTP/1.0 200 Ok');
+                    //echo json_encode($result);
+                    //echo json_encode(4);
+                    //$error_code = $result;
+                    $message = 'La operación se realizo satisfactoriamente';
+                    $error = false;
+                }
+
             } else {
                 $db->rollback();
-                header('HTTP/1.0 500 Internal Server Error');
-                echo $db->getLastError();
+                //header('HTTP/1.0 500 Internal Server Error');
+                //echo $db->getLastError();
+                //echo json_encode(3);
+                $message = 'Error guardando el dato';
+                $error = true;
             }
-        } else {
-            $db->rollback();
-            header('HTTP/1.0 500 Internal Server Error');
-            echo $db->getLastError();
         }
+
+        //echo json_encode($error_code);
+        //echo json_encode(['error' => $error, 'results' => $error_code]);
+        echo json_encode(['error' => $error, 'message' => $message]);
+    }
+
+    /*
+     *
+     */
+    function createDirecciones($direccion, $usuario_id, $db)
+    {
+        $data = array(
+            'usuario_id' => $usuario_id,
+            'calle' => $direccion->calle,
+            'nro' => $direccion->nro,
+            'piso' => $direccion->piso,
+            'puerta' => $direccion->puerta,
+            'ciudad_id' => $direccion->ciudad_id
+        );
+
+        $dir = $db->insert('direcciones', $data);
+        return ($dir > -1) ? true : false;
     }
 
     /* @name: clientExist
@@ -508,62 +693,112 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
     function update($params)
     {
         $db = self::$instance->db;
-        $db->startTransaction();
         $user_decoded = self::checkUsuario(json_decode($params["user"]));
+        $error = false;
+        $error_code = 0;
+        $message = '';
 
-        if ($user_decoded->password != '') {
-            self::changePassword($user_decoded->usuario_id, '', $user_decoded->password);
+        if($user_decoded->nro_doc != "") {
+            $SQL = 'Select usuario_id from usuarios where nro_doc ="' . $user_decoded->nro_doc . '" AND usuario_id != "' . $user_decoded->usuario_id . '"';
+            $db->rawQuery($SQL);
+            if ($db->count > 0) {
+                //header('HTTP/1.0 500 Internal Server Error');
+                //echo 'Existe un usuario con el DNI o CUIT ingresado';
+                //return;
+                $error_code = 1;
+                $message = 'Existe un usuario con el DNI o CUIT ingresado';
+                $error = true;
+            }
         }
 
-        $db->where('usuario_id', $user_decoded->usuario_id);
-        $data = array(
-            'nombre' => $user_decoded->nombre,
-            'apellido' => $user_decoded->apellido,
-            'mail' => $user_decoded->mail,
-            'nacionalidad_id' => $user_decoded->nacionalidad_id,
-            'tipo_doc' => $user_decoded->tipo_doc,
-            'nro_doc' => $user_decoded->nro_doc,
-            'comentarios' => $user_decoded->comentarios,
-            'marcado' => $user_decoded->marcado,
-            'telefono' => $user_decoded->telefono,
-            'fecha_nacimiento' => $user_decoded->fecha_nacimiento,
-            'profesion_id' => $user_decoded->profesion_id,
-            'saldo' => $user_decoded->saldo,
-            'rol_id' => $user_decoded->rol_id,
-            'news_letter' => $user_decoded->news_letter,
-            'cbu' => $user_decoded->cbu,
-            'social_login' => $user_decoded->social_login
-        );
+        if(!$error) {
+            if($user_decoded->mail != "") {
+                $SQL = 'Select usuario_id from usuarios where mail ="' . $user_decoded->mail . '" AND usuario_id != "' . $user_decoded->usuario_id . '"';
+                $db->rawQuery($SQL);
+                if ($db->count > 0) {
+                    //header('HTTP/1.0 500 Internal Server Error');
+                    //echo 'Existe un usuario con el Mail ingresado';
+                    //return;
+                    //$error_code = 2;
+                    $message = 'Existe un usuario con el Mail ingresado';
+                    $error = true;
+                }
+            }
+        }
 
-        if ($db->update('usuarios', $data)) {
+        if(!$error) {
+            $db = self::$instance->db;
+            $db->startTransaction();
+            $user_decoded = self::checkUsuario(json_decode($params["user"]));
 
+            if ($user_decoded->password != '') {
+                self::changePassword($user_decoded->usuario_id, '', $user_decoded->password);
+            }
 
             $db->where('usuario_id', $user_decoded->usuario_id);
             $data = array(
-                'calle' => $user_decoded->calle,
-                'nro' => $user_decoded->nro,
-                'piso' => $user_decoded->piso,
-                'puerta' => $user_decoded->puerta,
-                'ciudad_id' => $user_decoded->ciudad_id
+                'nombre' => $user_decoded->nombre,
+                'apellido' => $user_decoded->apellido,
+                'mail' => $user_decoded->mail,
+                'nacionalidad_id' => $user_decoded->nacionalidad_id,
+                'tipo_doc' => $user_decoded->tipo_doc,
+                'nro_doc' => $user_decoded->nro_doc,
+                'comentarios' => $user_decoded->comentarios,
+                'marcado' => $user_decoded->marcado,
+                'telefono' => $user_decoded->telefono,
+                'fecha_nacimiento' => $user_decoded->fecha_nacimiento,
+                'profesion_id' => $user_decoded->profesion_id,
+                'saldo' => $user_decoded->saldo,
+                'rol_id' => $user_decoded->rol_id,
+                'news_letter' => $user_decoded->news_letter,
+                'cbu' => $user_decoded->cbu,
+                'social_login' => $user_decoded->social_login,
+                'status' => $user_decoded->status,
+                'cta_cte' => $user_decoded->cta_cte
             );
 
-            $dir = $db->update('direcciones', $data);
+            $result = $db->update('usuarios', $data);
+            if ($result) {
 
-            if ($dir) {
-                header('HTTP/1.0 200 Ok');
-                $db->commit();
-                echo json_encode('Guardado con éxito');
+                $db->where('usuario_id', $user_decoded->usuario_id);
+                $db->delete('direcciones');
+
+                foreach ($user_decoded->direcciones as $direccion) {
+                    if (!self::createDirecciones($direccion, $user_decoded->usuario_id, $db)) {
+                        $db->rollback();
+                        //header('HTTP/1.0 500 Internal Server Error');
+                        //echo $db->getLastError();
+                        //return;
+                        $message = 'Error guardando la dirección';
+                        $error = true;
+                    }
+                }
+
+                if($error) {
+                    $db->rollback();
+                    header('HTTP/1.0 500 Internal Server Error');
+                } else {
+                    $db->commit();
+                    header('HTTP/1.0 200 Ok');
+                    //echo json_encode($result);
+                    //echo json_encode(4);
+                    //$error_code = $result;
+                    $message = 'La operación se realizo satisfactoriamente';
+                    $error = false;
+                }
+
             } else {
-                header('HTTP/1.0 500 Internal Server Error');
                 $db->rollback();
-                echo $db->getLastError();
+                //header('HTTP/1.0 500 Internal Server Error');
+                //echo $db->getLastError();
+                //echo json_encode(3);
+                $message = 'Error guardando el dato';
+                $error = true;
             }
-
-        } else {
-            header('HTTP/1.0 500 Internal Server Error');
-            $db->rollback();
-            echo $db->getLastError();
         }
+
+        echo json_encode(['error' => $error, 'message' => $message]);
+
     }
 
     /**
@@ -591,8 +826,6 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
      */
     function checkUsuario($usuario)
     {
-
-
         $usuario->nombre = (!array_key_exists("nombre", $usuario)) ? '' : $usuario->nombre;
         $usuario->apellido = (!array_key_exists("apellido", $usuario)) ? '' : $usuario->apellido;
         $usuario->mail = (!array_key_exists("mail", $usuario)) ? '' : $usuario->mail;
@@ -608,16 +841,38 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
         $usuario->password = (!array_key_exists("password", $usuario)) ? '' : $usuario->password;
         $usuario->rol_id = (!array_key_exists("rol_id", $usuario)) ? 0 : $usuario->rol_id;
         $usuario->news_letter = (!array_key_exists("news_letter", $usuario)) ? 0 : $usuario->news_letter;
-        $usuario->calle = (!array_key_exists("calle", $usuario)) ? '' : $usuario->calle;
-        $usuario->puerta = (!array_key_exists("puerta", $usuario)) ? '' : $usuario->puerta;
-        $usuario->piso = (!array_key_exists("piso", $usuario)) ? 0 : $usuario->piso;
-        $usuario->nro = (!array_key_exists("nro", $usuario)) ? 0 : $usuario->nro;
-        $usuario->ciudad_id = (!array_key_exists("ciudad_id", $usuario)) ? 0 : $usuario->ciudad_id;
         $usuario->cbu = (!array_key_exists("cbu", $usuario)) ? 0 : $usuario->cbu;
         $usuario->social_login = (!array_key_exists("social_login", $usuario)) ? 0 : $usuario->social_login;
+        $usuario->status = (!array_key_exists("status", $usuario)) ? 0 : $usuario->status;
+        $usuario->cta_cte = (!array_key_exists("cta_cte", $usuario)) ? 0 : $usuario->cta_cte;
+        $usuario->direcciones = (!array_key_exists("direcciones", $usuario)) ? array() : self::checkDirecciones($usuario->direcciones);
+        //$usuario->calle = (!array_key_exists("calle", $usuario)) ? '' : $usuario->calle;
+        //$usuario->puerta = (!array_key_exists("puerta", $usuario)) ? '' : $usuario->puerta;
+        //$usuario->piso = (!array_key_exists("piso", $usuario)) ? 0 : $usuario->piso;
+        //$usuario->nro = (!array_key_exists("nro", $usuario)) ? 0 : $usuario->nro;
+        //$usuario->ciudad_id = (!array_key_exists("ciudad_id", $usuario)) ? 0 : $usuario->ciudad_id;
 
         return $usuario;
     }
+
+    /**
+     * @param $direcciones
+     * @return mixed
+     */
+    function checkDirecciones($direcciones) {
+        foreach ($direcciones as $direccion) {
+            $direccion->usuario_id = (!array_key_exists("usuario_id", $direccion)) ? 0 : $direccion->usuario_id;
+            $direccion->direccion_id = (!array_key_exists("direccion_id", $direccion)) ? 0 : $direccion->direccion_id;
+            $direccion->calle = (!array_key_exists("calle", $direccion)) ? '' : $direccion->calle;
+            $direccion->puerta = (!array_key_exists("puerta", $direccion)) ? '' : $direccion->puerta;
+            $direccion->piso = (!array_key_exists("piso", $direccion)) ? 0 : $direccion->piso;
+            $direccion->nro = (!array_key_exists("nro", $direccion)) ? 0 : $direccion->nro;
+            $direccion->ciudad_id = (!array_key_exists("ciudad_id", $direccion)) ? 0 : $direccion->ciudad_id;
+        }
+
+        return $direcciones;
+    }
+
 }
 
 

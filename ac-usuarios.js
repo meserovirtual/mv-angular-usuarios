@@ -5,7 +5,7 @@
     var currentScriptPath = scripts[scripts.length - 1].src;
 
     if (currentScriptPath.length == 0) {
-        currentScriptPath = window.installPath + '/ac-angular-usuarios/includes/ac-usuarios.php';
+        currentScriptPath = window.installPath + '/mv-angular-usuarios/includes/ac-usuarios.php';
     }
 
     angular.module('acUsuarios', [])
@@ -258,9 +258,11 @@
          * @param callback
          * @description: Retorna todos los usuario de la base.
          */
-        function get() {
+        function get(rol_id) {
             AcUtilsGlobals.startWaiting();
-            var urlGet = url + '?function=get';
+            //var urlGet = url + '?function=get';
+            //var urlGet = url + '?function=get&all=' + UserVars.all;
+            var urlGet = url + '?function=get&rol_id=' + rol_id;
             var $httpDefaultCache = $cacheFactory.get('$http');
             var cachedData = [];
 
@@ -282,9 +284,11 @@
             return $http.get(urlGet, {cache: true})
                 .then(function (response) {
 
+                    /*
                     for (var i = 0; i < response.data.length; i++) {
                         response.data[i].tipo_doc = '' + response.data[i].tipo_doc;
                     }
+                    */
 
                     $httpDefaultCache.put(urlGet, response.data);
                     UserVars.clearCache = false;
@@ -656,6 +660,8 @@
         this.user_social = {};
         this.token_social = '';
 
+        // Indica si debe traer todos los usuarios o solo los activos, por defecto, solo activos
+        this.all = false;
         // Indica si se debe limpiar el cach� la pr�xima vez que se solicite un get
         this.clearCache = true;
 

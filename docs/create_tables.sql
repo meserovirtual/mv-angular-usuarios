@@ -20,6 +20,8 @@ CREATE TABLE usuarios (
   social_login     INT(1)                DEFAULT 0
   COMMENT 'Especifica si utiliza una cuenta social para logearse | 0: no, 1:google, 2:facebook',
   modified         TIMESTAMP             DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP,
+  status           INT(1)                DEFAULT '1',
+  cta_cte          INT(1)                DEFAULT '0',
   PRIMARY KEY (usuario_id),
   UNIQUE KEY 'mail' ('mail')
 )

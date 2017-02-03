@@ -3,33 +3,33 @@
         <div class="buscador-container">
             <div class="input">
                 <input type="text" class="buscador" ng-model="$ctrl.filtro"
-                       placeholder="Buscar Usuario" style="width: 100%">
+                       placeholder="Buscar Proveedor" style="width: 100%">
             </div>
         </div>
 
         <table>
             <thead>
             <tr>
-                <th>{{'NAME'|xlat}}</th>
-                <th>Usuario</th>
-                <th>Perfil</th>
+                <th>Razón Social</th>
+                <th>CUIT</th>
+                <th>{{'PHONE'|xlat}}</th>
                 <th>Activo</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="row in $ctrl.usuarios | filter:$ctrl.filtro | limitTo:$ctrl.limit:$ctrl.start"
                 ng-click="row.rol_id=''+row.rol_id;$ctrl.usuario=row;$ctrl.status=($ctrl.usuario.status == 1 ? true : false);
-                $ctrl.repeat_password='';$ctrl.detailsOpen=true;$ctrl.update=true;">
+                $ctrl.detailsOpen=true;$ctrl.update=true;">
                 <td class="">{{row.nombre}}</td>
-                <td class="">{{row.mail}}</td>
-                <td class="">{{$ctrl.getPerfil(row.rol_id);}}</td>
+                <td class="">{{row.nro_doc}}</td>
+                <td class="">{{row.telefono}}</td>
                 <td class="">{{row.status == 0 ? 'N' : 'S'}}</td>
             </tr>
             </tbody>
             <tfoot>
-                <tr>
-                    <td colspan="4">
-                        <div class="table-td">
+            <tr>
+                <td colspan="4">
+                    <div class="table-td">
                             <span>
                                 <button class="paginacion-primera" ng-click="$ctrl.first();"></button>
                                 <button class="paginacion-ant" ng-click="$ctrl.prev();"></button>
@@ -45,9 +45,9 @@
                                 <button class="paginacion-sig" ng-click="$ctrl.next();"></button>
                                 <button class="paginacion-ultima"ng-click="$ctrl.last();"></button>
                             </span>
-                        </div>
-                    </td>
-                </tr>
+                    </div>
+                </td>
+            </tr>
             </tfoot>
         </table>
         <div class="botonera">
@@ -59,40 +59,16 @@
 
     <form class="form-abm" form-id="abm-detalle" ng-class="{'form-open':$ctrl.detailsOpen}">
         <div class="detalle-container">
-            <h2>Nuevo Usuario</h2>
+            <h2>Nuevo Proveedor</h2>
 
             <div class="mv-col">
-                <div class="input" data-tip="Apellido">
-                    <input id="apellido" type="text" ng-model="$ctrl.usuario.apellido" placeholder="{{'LAST_NAME'|xlat}}"
-                           maxlength="20"/>
+                <div class="input" data-tip="Razón Social">
+                    <input id="nombre" type="text" ng-model="$ctrl.usuario.nombre" placeholder="Razón Social"
+                           maxlength="100"/>
                 </div>
-                <div class="input" data-tip="Nombre">
-                    <input id="nombre" type="text" ng-model="$ctrl.usuario.nombre" placeholder="{{'NAME'|xlat}}"
-                           maxlength="30"/>
-                </div>
-            </div>
-            <div class="mv-col">
-                <div class="input" data-tip="Contraseña">
-                    <input id="password" type="password" ng-model="$ctrl.usuario.password" placeholder="Contraseña"
+                <div class="input" data-tip="CUIT xxxxxxxxxxx">
+                    <input id="nro_doc" type="text" ng-model="$ctrl.usuario.nro_doc" placeholder="CUIT"
                            autocomplete="off" maxlength="15"/>
-                </div>
-                <div class="input" data-tip="Repetir Contraseña">
-                    <input id="repeat_password" type="password" ng-model="$ctrl.repeat_password" placeholder="Repetir Contraseña"
-                           autocomplete="off" maxlength="15"/>
-                </div>
-            </div>
-            <div class="mv-col">
-                <div class="input" data-tip="Mail xxx@xxx.com">
-                    <input id="email" type="text" ng-model="$ctrl.usuario.mail" placeholder="{{'EMAIL'|xlat}}"
-                           autocomplete="off" maxlength="100"/>
-                </div>
-                <div class="mdl-selectfield">
-                    <label>Perfil</label>
-                    <select name="destacado" id="destacado" ng-model="$ctrl.usuario.rol_id" class="browser-default">
-                        <option value="" disabled selected>Perfil</option>
-                        <option value="0" >Administrador</option>
-                        <option value="1" selected>Usuario</option>
-                    </select>
                 </div>
             </div>
             <div class="mv-col">
@@ -100,12 +76,41 @@
                     <input id="telefono" type="text" ng-model="$ctrl.usuario.telefono" placeholder="{{'PHONE'|xlat}}"
                            autocomplete="off" maxlength="15"/>
                 </div>
+                <div class="input" data-tip="Mail xxx@xxx.com">
+                    <input id="email" type="text" ng-model="$ctrl.usuario.mail" placeholder="{{'EMAIL'|xlat}}"
+                           autocomplete="off" maxlength="100"/>
+                </div>
+            </div>
+            <!--<div class="mv-col">
+                <div class="input" data-tip="web">
+                    <input id="web" type="text" ng-model="$ctrl.usuario.direcciones[0].calle" placeholder="{{'ADDRESS'|xlat}}"
+                           autocomplete="off" maxlength="150"/>
+                </div>
+            </div>-->
+            <div class="mv-col">
+                <div class="input" data-tip="Dirección">
+                    <input id="direccion" type="text" ng-model="$ctrl.usuario.direcciones[0].calle" placeholder="{{'ADDRESS'|xlat}}"
+                           autocomplete="off" maxlength="100"/>
+                </div>
+                <div class="input" data-tip="Número">
+                    <input id="dir_nro" type="number" ng-model="$ctrl.usuario.direcciones[0].nro" placeholder="Número"
+                           autocomplete="off" max="99999" />
+                </div>
+            </div>
+            <div class="mv-col">
+                <div class="input" data-tip="Piso">
+                    <input id="piso" type="text" ng-model="$ctrl.usuario.direcciones[0].piso" placeholder="Piso"
+                           autocomplete="off" maxlength="4"/>
+                </div>
+                <div class="input" data-tip="Puerta">
+                    <input id="puerta" type="text" ng-model="$ctrl.usuario.direcciones[0].puerta" placeholder="Puerta"
+                           autocomplete="off" maxlength="4"/>
+                </div>
             </div>
             <div class="mv-col">
                 <label class="label--checkbox" ng-click="$ctrl.status=!$ctrl.status" ng-if="$ctrl.update">
                     <input type="checkbox" class="checkbox" id="check-status" ng-checked="$ctrl.status">Estado
                 </label>
-
             </div>
 
             <div class="botonera">
