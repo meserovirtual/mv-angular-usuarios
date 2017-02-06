@@ -1,25 +1,25 @@
 (function () {
     'use strict';
 
-    angular.module('acClientesAdministracion', [])
-        .component('acClientesAdministracion', acClientesAdministracion());
+    angular.module('mvClientesAdministracion', [])
+        .component('mvClientesAdministracion', mvClientesAdministracion());
 
-    function acClientesAdministracion() {
+    function mvClientesAdministracion() {
         return {
             bindings: {
                 searchFunction: '&'
             },
-            templateUrl: window.installPath + '/mv-angular-usuarios/ac-clientes-administracion.html',
-            controller: AcClientesController
+            templateUrl: window.installPath + '/mv-angular-usuarios/mv-clientes-administracion.html',
+            controller: MvClientesController
         }
     }
 
-    AcClientesController.$inject = ["UserVars", 'UserService', "AcUtils"];
+    MvClientesController.$inject = ["UserVars", 'UserService', "AcUtils"];
     /**
      * @param AcUsuarios
      * @constructor
      */
-    function AcClientesController(UserVars, UserService, AcUtils) {
+    function MvClientesController(UserVars, UserService, AcUtils) {
         var vm = this;
 
         vm.usuarios = [];

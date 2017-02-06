@@ -5,10 +5,10 @@
     var currentScriptPath = scripts[scripts.length - 1].src;
 
     if (currentScriptPath.length == 0) {
-        currentScriptPath = window.installPath + '/mv-angular-usuarios/includes/ac-usuarios.php';
+        currentScriptPath = window.installPath + '/mv-angular-usuarios/includes/mv-usuarios.php';
     }
 
-    angular.module('acUsuarios', [])
+    angular.module('mvUsuarios', [])
         .config(function Config($httpProvider, jwtInterceptorProvider) {
             jwtInterceptorProvider.tokenGetter = [function () {
                 return localStorage.getItem(window.app);
@@ -44,18 +44,18 @@
                 'social': '<',
                 'register': '<'
             },
-            templateUrl: window.installPath + '/ac-angular-usuarios/ac-usuarios-login.html',
-            controller: AcLoginController
+            templateUrl: window.installPath + '/mv-angular-usuarios/mv-usuarios-login.html',
+            controller: MvLoginController
         }
     }
 
-    AcLoginController.$inject = ["UserService", '$location', '$rootScope', 'SucursalesService'];
+    MvLoginController.$inject = ["UserService", '$location', '$rootScope', 'SucursalesService'];
     /**
      * @param UserService
      * @param $location
      * @constructor
      */
-    function AcLoginController(UserService, $location, $rootScope, SucursalesService) {
+    function MvLoginController(UserService, $location, $rootScope, SucursalesService) {
         var vm = this;
         vm.email = '';
         vm.password = '';
@@ -103,18 +103,18 @@
             bindings: {
                 'redirect': '='
             },
-            //template: '<button class="ac-usuarios-logout" ng-click="$ctrl.logout()">{{"LOGOUT"|xlat}}</button>',
+            //template: '<button class="mv-usuarios-logout" ng-click="$ctrl.logout()">{{"LOGOUT"|xlat}}</button>',
             template: '<img class="btn-img" style="margin: 5px;" src="images/logout.png" ng-click="$ctrl.logout()" width="30" height="30">',
             controller: AcLogoutController
         }
     }
 
-    AcLogoutController.$inject = ["UserService", '$rootScope'];
+    MvLogoutController.$inject = ["UserService", '$rootScope'];
     /**
      * @param $scope
      * @constructor
      */
-    function AcLogoutController(UserService, $rootScope) {
+    function MvLogoutController(UserService, $rootScope) {
         var vm = this;
         vm.dir = (vm.redirect == undefined) ? '/logout' : vm.redirect;
         vm.logout = logout;
@@ -134,7 +134,7 @@
         //Variables
         var service = {};
 
-        var url = currentScriptPath.replace('ac-usuarios.js', '/includes/ac-usuarios.php');
+        var url = currentScriptPath.replace('mv-usuarios.js', '/includes/mv-usuarios.php');
 
         //Function declarations
         service.getLogged = getLogged;

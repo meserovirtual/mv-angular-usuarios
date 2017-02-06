@@ -1,30 +1,31 @@
 (function () {
     'use strict';
 
-    angular.module('acProveedoresAdministracion', [])
-        .component('acProveedoresAdministracion', acProveedoresAdministracion());
+    angular.module('mvUsuariosAdministracion', [])
+        .component('mvUsuariosAdministracion', mvUsuariosAdministracion());
 
-    function acProveedoresAdministracion() {
+    function mvUsuariosAdministracion() {
         return {
             bindings: {
                 searchFunction: '&'
             },
-            templateUrl: window.installPath + '/mv-angular-usuarios/ac-proveedores-administracion.html',
-            controller: AcProveedoresController
+            templateUrl: window.installPath + '/mv-angular-usuarios/mv-usuarios-administracion.html',
+            controller: MvUsuariosController
         }
     }
 
-    AcProveedoresController.$inject = ["UserVars", 'UserService', "AcUtils"];
+    MvUsuariosController.$inject = ["UserVars", 'UserService', "AcUtils"];
     /**
      * @param AcUsuarios
      * @constructor
      */
-    function AcProveedoresController(UserVars, UserService, AcUtils) {
+    function MvUsuariosController(UserVars, UserService, AcUtils) {
         var vm = this;
 
         vm.usuarios = [];
         vm.usuario = {};
         vm.status = true;
+        vm.repeat_password = '';
         vm.detailsOpen = false;
         vm.update = false;
 
@@ -33,15 +34,16 @@
         vm.setData = setData;
         vm.loadUsuarios = loadUsuarios;
         vm.remove = remove;
+        vm.getPerfil = getPerfil;
         vm.cleanUsuario = cleanUsuario;
 
 
-        var element1 = angular.element(document.getElementById('nombre'));
-        var element2 = angular.element(document.getElementById('telefono'));
-        var element3 = angular.element(document.getElementById('nro_doc'));
-        var element4 = angular.element(document.getElementById('email'));
-        var element5 = angular.element(document.getElementById('direccion'));
-        var element6 = angular.element(document.getElementById('dir_nro'));
+        var element1 = angular.element(document.getElementById('apellido'));
+        var element2 = angular.element(document.getElementById('nombre'));
+        var element3 = angular.element(document.getElementById('password'));
+        var element4 = angular.element(document.getElementById('repeat_password'));
+        var element5 = angular.element(document.getElementById('email'));
+        var element6 = angular.element(document.getElementById('telefono'));
 
         element1[0].addEventListener('focus', function () {
             element1[0].classList.remove('error-input');
@@ -73,92 +75,75 @@
             element6[0].removeEventListener('focus', removeFocus);
         });
 
+
         function removeFocus() { }
 
         loadUsuarios();
 
         function loadUsuarios() {
             UserVars.all = true;
-            UserService.get(2).then(function (data) {
+            UserService.get('0,1').then(function (data) {
                 console.log(data);
                 setData(data);
             });
         }
 
-        function getFechaNacimiento(fechaNacimiento) {
-            var dia = fechaNacimiento.substring(0,2);
-            var mes = fechaNacimiento.substring(3,5);
-            var anio = fechaNacimiento.substring(6,10);
-            var date = new Date(anio, mes-1, dia);
-
-            return date;
-        }
 
         function save() {
-            if(vm.usuario.nombre === undefined || vm.usuario.nombre.length == 0) {
+            console.log(vm.usuario);
+
+            if(vm.usuario.apellido === undefined || vm.usuario.apellido.length == 0) {
                 element1[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'La Razón Social es obligatoria');
+                AcUtils.showMessage('error', 'El apellido obligatorio');
                 return;
             }
-            if(vm.usuario.telefono === undefined || vm.usuario.telefono.length == 0) {
+            if(vm.usuario.nombre === undefined || vm.usuario.nombre.length == 0) {
                 element2[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El teléfono es obligatorio');
+                AcUtils.showMessage('error', 'El nombre es obligatorio');
                 return;
-            } else if(!AcUtils.validaTelefono(vm.usuario.telefono)) {
-                element2[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El formato del teléfono no es correcto');
+            }
+            if(vm.usuario.password === undefined || vm.usuario.password.length == 0){
+                element3[0].classList.add('error-input');
+                AcUtils.showMessage('error', 'El contraseña es obligatoria');
+                return;
+            }
+            if(vm.repeat_password === undefined || vm.repeat_password.length == 0){
+                element4[0].classList.add('error-input');
+                AcUtils.showMessage('error', 'Debe repetir la contraseña');
+                return;
+            }
+            if(vm.usuario.password != vm.repeat_password){
+                element3[0].classList.add('error-input');
+                element4[0].classList.add('error-input');
+                AcUtils.showMessage('error', 'Las contraseñas deben ser iguales');
                 return;
             }
             if(vm.usuario.mail === undefined || vm.usuario.mail.length == 0) {
-                element4[0].classList.add('error-input');
+                element5[0].classList.add('error-input');
                 AcUtils.showMessage('error', 'El mail es obligatorio');
                 return;
             } else if(!AcUtils.validateEmail(vm.usuario.mail)) {
-                element4[0].classList.add('error-input');
+                element5[0].classList.add('error-input');
                 AcUtils.showMessage('error', 'El mail no tiene un formato correcto');
                 return;
             }
-            if(vm.usuario.nro_doc === undefined || vm.usuario.nro_doc.length == 0) {
-                element3[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El CUIT es obligatorio');
+            if(vm.usuario.telefono === undefined || vm.usuario.telefono.length == 0) {
+                element6[0].classList.add('error-input');
+                AcUtils.showMessage('error', 'El teléfono es obligatorio');
                 return;
-            } else if(!AcUtils.validaNumero(vm.usuario.nro_doc)){
-                element3[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'Por favor ingrese solo números en CUIT');
+            } else if(!AcUtils.validaTelefono(vm.usuario.telefono)) {
+                element6[0].classList.add('error-input');
+                AcUtils.showMessage('error', 'El formato del teléfono no es correcto');
                 return;
-            } else if(!AcUtils.validaCuit(vm.usuario.nro_doc)) {
-                element3[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El CUIT no tiene un formato correcto');
-                return;
-            } else {
-                element3[0].classList.remove('error-input');
             }
 
-            if(vm.usuario.direcciones != undefined) {
-                if(vm.usuario.direcciones[0].calle.length > 100){
-                    element5[0].classList.add('error-input');
-                    AcUtils.showMessage('error', 'El calle no puede tener más de 100 caracteres');
-                    return;
-                }
-                if(vm.usuario.direcciones[0].nro === undefined) {
-                    element6[0].classList.add('error-input');
-                    AcUtils.showMessage('error', 'El número no puede ser mayor a 99999');
-                    return;
-                } else if(vm.usuario.direcciones[0].nro < 0) {
-                    element6[0].classList.add('error-input');
-                    AcUtils.showMessage('error', 'El número no puede ser negativo');
-                    return;
-                }
-            }
-
-            vm.usuario.rol_id = 2;
-            vm.usuario.news_letter = 0;
             if (vm.usuario.usuario_id == undefined) {
                 vm.usuario.status = 1;
             } else {
                 vm.usuario.status = vm.status ? 1 : 0;
             }
             UserService.save(vm.usuario).then(function (data) {
+                console.log(data);
                 //vm.detailsOpen = (data === undefined || data < 0) ? true : false;
                 vm.detailsOpen = data.error;
 
@@ -167,6 +152,8 @@
                     element2[0].classList.add('error-input');
                     element3[0].classList.add('error-input');
                     element4[0].classList.add('error-input');
+                    element5[0].classList.add('error-input');
+                    element6[0].classList.add('error-input');
                     AcUtils.showMessage('error', data.message);
                 }
                 else {
@@ -176,6 +163,8 @@
                     element2[0].classList.remove('error-input');
                     element3[0].classList.remove('error-input');
                     element4[0].classList.remove('error-input');
+                    element5[0].classList.remove('error-input');
+                    element6[0].classList.remove('error-input');
                     AcUtils.showMessage('success', data.message);
                 }
             }).catch(function (data) {
@@ -194,7 +183,7 @@
             if(vm.usuario.usuario_id == undefined) {
                 alert('Debe seleccionar un Cliente');
             } else {
-                var result = confirm('¿Esta seguro que desea eliminar al proveedor seleccionado?');
+                var result = confirm('¿Esta seguro que desea eliminar al usuario seleccionado?');
                 if(result) {
                     UserService.remove(vm.usuario.usuario_id, function(data){
                         vm.detailsOpen = false;
@@ -211,6 +200,8 @@
             element2[0].classList.remove('error-input');
             element3[0].classList.remove('error-input');
             element4[0].classList.remove('error-input');
+            element5[0].classList.remove('error-input');
+            element6[0].classList.remove('error-input');
             vm.usuarios = [];
             vm.detailsOpen = false;
             UserVars.clearCache = true;
@@ -218,11 +209,23 @@
             loadUsuarios();
         }
 
-
+        function getPerfil(rol_id) {
+            var perfil = '';
+            if(rol_id == 0) {
+                perfil = 'Administrador';
+            } else if(rol_id == 1) {
+                perfil = 'Usuarios';
+            } else if(rol_id == 2) {
+                perfil = 'Proveedor';
+            } else if(rol_id == 3) {
+                perfil = 'Clientes';
+            }
+            return perfil;
+        }
 
         function cleanUsuario() {
             vm.usuario = {};
-            vm.usuario.comentario = '';
+            vm.repeat_password = '';
             vm.status = false;
             vm.update = false;
         }
