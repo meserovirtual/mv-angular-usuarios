@@ -105,7 +105,7 @@
             },
             //template: '<button class="mv-usuarios-logout" ng-click="$ctrl.logout()">{{"LOGOUT"|xlat}}</button>',
             template: '<img class="btn-img" style="margin: 5px;" src="images/logout.png" ng-click="$ctrl.logout()" width="30" height="30">',
-            controller: AcLogoutController
+            controller: MvLogoutController
         }
     }
 
