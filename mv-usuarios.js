@@ -129,8 +129,8 @@
     }
 
 
-    UserService.$inject = ['$http', 'UserVars', '$cacheFactory', 'AcUtils', 'jwtHelper', 'auth', 'ErrorHandler', '$q', '$location', 'AcUtilsGlobals'];
-    function UserService($http, UserVars, $cacheFactory, AcUtils, jwtHelper, auth, ErrorHandler, $q, $location, AcUtilsGlobals) {
+    UserService.$inject = ['$http', 'UserVars', '$cacheFactory', 'MvUtils', 'jwtHelper', 'auth', 'ErrorHandler', '$q', '$location', 'MvUtilsGlobals'];
+    function UserService($http, UserVars, $cacheFactory, MvUtils, jwtHelper, auth, ErrorHandler, $q, $location, MvUtilsGlobals) {
         //Variables
         var service = {};
 
@@ -228,7 +228,7 @@
          */
         function getByParams(params, values, exact_match) {
             return get().then(function (data) {
-                return AcUtils.getByParams(params, values, exact_match, data);
+                return MvUtils.getByParams(params, values, exact_match, data);
             }).then(function (data) {
                 return data;
             });
@@ -259,7 +259,7 @@
          * @description: Retorna todos los usuario de la base.
          */
         function get(rol_id) {
-            AcUtilsGlobals.startWaiting();
+            MvUtilsGlobals.startWaiting();
             //var urlGet = url + '?function=get';
             //var urlGet = url + '?function=get&all=' + UserVars.all;
             var urlGet = url + '?function=get&rol_id=' + rol_id;
@@ -275,7 +275,7 @@
                     var deferred = $q.defer();
                     cachedData = $httpDefaultCache.get(urlGet);
                     deferred.resolve(cachedData);
-                    AcUtilsGlobals.stopWaiting();
+                    MvUtilsGlobals.stopWaiting();
                     return deferred.promise;
                 }
             }
@@ -293,11 +293,11 @@
                     $httpDefaultCache.put(urlGet, response.data);
                     UserVars.clearCache = false;
                     UserVars.paginas = (response.data.length % UserVars.paginacion == 0) ? parseInt(response.data.length / UserVars.paginacion) : parseInt(response.data.length / UserVars.paginacion) + 1;
-                    AcUtilsGlobals.stopWaiting();
+                    MvUtilsGlobals.stopWaiting();
                     return response.data;
                 })
                 .catch(function (response) {
-                    AcUtilsGlobals.stopWaiting();
+                    MvUtilsGlobals.stopWaiting();
                     ErrorHandler(response);
                 });
 

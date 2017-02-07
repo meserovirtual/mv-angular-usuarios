@@ -14,12 +14,12 @@
         }
     }
 
-    MvClientesController.$inject = ["UserVars", 'UserService', "AcUtils"];
+    MvClientesController.$inject = ["UserVars", 'UserService', "MvUtils"];
     /**
      * @param AcUsuarios
      * @constructor
      */
-    function MvClientesController(UserVars, UserService, AcUtils) {
+    function MvClientesController(UserVars, UserService, MvUtils) {
         var vm = this;
 
         vm.usuarios = [];
@@ -113,42 +113,42 @@
         function save() {
             if(vm.usuario.apellido === undefined || vm.usuario.apellido.length == 0) {
                 element1[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El apellido es obligatorio');
+                MvUtils.showMessage('error', 'El apellido es obligatorio');
                 return;
             }
             if(vm.usuario.nombre === undefined || vm.usuario.nombre.length == 0) {
                 element2[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El nombre es obligatorio');
+                MvUtils.showMessage('error', 'El nombre es obligatorio');
                 return;
             }
             if(vm.usuario.telefono === undefined || vm.usuario.telefono.length == 0) {
                 element3[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El teléfono es obligatorio');
+                MvUtils.showMessage('error', 'El teléfono es obligatorio');
                 return;
-            } else if(!AcUtils.validaTelefono(vm.usuario.telefono)) {
+            } else if(!MvUtils.validaTelefono(vm.usuario.telefono)) {
                 element3[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El formato del teléfono no es correcto');
+                MvUtils.showMessage('error', 'El formato del teléfono no es correcto');
                 return;
             }
             if(vm.usuario.mail === undefined || vm.usuario.mail.length == 0) {
                 element6[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El mail es obligatorio');
+                MvUtils.showMessage('error', 'El mail es obligatorio');
                 return;
-            } else if(!AcUtils.validateEmail(vm.usuario.mail)) {
+            } else if(!MvUtils.validateEmail(vm.usuario.mail)) {
                 element6[0].classList.add('error-input');
-                AcUtils.showMessage('error', 'El mail no tiene un formato correcto');
+                MvUtils.showMessage('error', 'El mail no tiene un formato correcto');
                 return;
             }
             if(vm.usuario.nro_doc != undefined && vm.usuario.nro_doc.length > 0) {
-                if(!AcUtils.validaNumero(vm.usuario.nro_doc)){
+                if(!MvUtils.validaNumero(vm.usuario.nro_doc)){
                     element4[0].classList.add('error-input');
-                    AcUtils.showMessage('error', 'Por favor ingrese solo números en DNI/CUIT');
+                    MvUtils.showMessage('error', 'Por favor ingrese solo números en DNI/CUIT');
                     return;
                 } else if(vm.usuario.nro_doc.length > 8) {
                     //Si es mayor a 8 digitos que valida un cuit
-                    if(!AcUtils.validaCuit(vm.usuario.nro_doc)) {
+                    if(!MvUtils.validaCuit(vm.usuario.nro_doc)) {
                         element4[0].classList.add('error-input');
-                        AcUtils.showMessage('error', 'El CUIL/CUIT no tiene un formato correcto');
+                        MvUtils.showMessage('error', 'El CUIL/CUIT no tiene un formato correcto');
                         return;
                     } else {
                         element4[0].classList.remove('error-input');
@@ -157,13 +157,13 @@
             }
             if(vm.usuario.fecha_nacimiento != undefined && vm.usuario.fecha_nacimiento.length > 0) {
                 var currentDate = new Date();
-                if(!AcUtils.validaFecha(vm.usuario.fecha_nacimiento)) {
+                if(!MvUtils.validaFecha(vm.usuario.fecha_nacimiento)) {
                     element5[0].classList.add('error-input');
-                    AcUtils.showMessage('error', 'El formato de la fecha no es correcto');
+                    MvUtils.showMessage('error', 'El formato de la fecha no es correcto');
                     return;
                 } else if(getFechaNacimiento(vm.usuario.fecha_nacimiento) >= currentDate) {
                     element5[0].classList.add('error-input');
-                    AcUtils.showMessage('error', 'La fecha ingresada no puede ser mayor que la fecha actual');
+                    MvUtils.showMessage('error', 'La fecha ingresada no puede ser mayor que la fecha actual');
                     return;
                 } else {
                     element5[0].classList.remove('error-input');
@@ -173,16 +173,16 @@
             if(vm.usuario.direcciones != undefined) {
                 if(vm.usuario.direcciones[0].calle.length > 100){
                     element7[0].classList.add('error-input');
-                    AcUtils.showMessage('error', 'El calle no puede tener más de 100 caracteres');
+                    MvUtils.showMessage('error', 'El calle no puede tener más de 100 caracteres');
                     return;
                 }
                 if(vm.usuario.direcciones[0].nro === undefined) {
                     element8[0].classList.add('error-input');
-                    AcUtils.showMessage('error', 'El número no puede ser mayor a 99999');
+                    MvUtils.showMessage('error', 'El número no puede ser mayor a 99999');
                     return;
                 } else if(vm.usuario.direcciones[0].nro < 0) {
                     element8[0].classList.add('error-input');
-                    AcUtils.showMessage('error', 'El número no puede ser negativo');
+                    MvUtils.showMessage('error', 'El número no puede ser negativo');
                     return;
                 }
             }
@@ -204,7 +204,7 @@
                     element2[0].classList.add('error-input');
                     element3[0].classList.add('error-input');
                     element6[0].classList.add('error-input');
-                    AcUtils.showMessage('error', data.message);
+                    MvUtils.showMessage('error', data.message);
                 }
                 else {
                     cleanUsuario();
@@ -213,7 +213,7 @@
                     element2[0].classList.remove('error-input');
                     element3[0].classList.remove('error-input');
                     element6[0].classList.remove('error-input');
-                    AcUtils.showMessage('success', data.message);
+                    MvUtils.showMessage('success', data.message);
                 }
             }).catch(function (data) {
                 vm.usuario = {};
@@ -237,7 +237,7 @@
                         cleanUsuario();
                         vm.detailsOpen = false;
                         loadUsuarios();
-                        AcUtils.showMessage('success', 'La registro se borro satisfactoriamente');
+                        MvUtils.showMessage('success', 'La registro se borro satisfactoriamente');
                     });
                 }
             }
@@ -288,20 +288,20 @@
         }
 
         vm.next = function () {
-            paginar(AcUtils.next(UserVars));
+            paginar(MvUtils.next(UserVars));
         };
         vm.prev = function () {
-            paginar(AcUtils.prev(UserVars));
+            paginar(MvUtils.prev(UserVars));
         };
         vm.first = function () {
-            paginar(AcUtils.first(UserVars));
+            paginar(MvUtils.first(UserVars));
         };
         vm.last = function () {
-            paginar(AcUtils.last(UserVars));
+            paginar(MvUtils.last(UserVars));
         };
 
         vm.goToPagina = function () {
-            paginar(AcUtils.goToPagina(vm.pagina, UserVars));
+            paginar(MvUtils.goToPagina(vm.pagina, UserVars));
         }
 
     }
