@@ -109,20 +109,12 @@
         }
     }
 
-<<<<<<< HEAD:ac-usuarios.js
     AcLogoutController.$inject = ["UserService", '$rootScope', '$timeout'];
-=======
-    MvLogoutController.$inject = ["UserService", '$rootScope'];
->>>>>>> 505502ca7a2391b264dfcff1ad8a5a91f0a4a629:mv-usuarios.js
     /**
      * @param $scope
      * @constructor
      */
-<<<<<<< HEAD:ac-usuarios.js
     function AcLogoutController(UserService, $rootScope, $timeout) {
-=======
-    function MvLogoutController(UserService, $rootScope) {
->>>>>>> 505502ca7a2391b264dfcff1ad8a5a91f0a4a629:mv-usuarios.js
         var vm = this;
         $timeout(function () {
             vm.dir = (vm.redirect == undefined) ? '/logout' : vm.redirect;
