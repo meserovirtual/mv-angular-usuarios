@@ -5,10 +5,10 @@
     var currentScriptPath = scripts[scripts.length - 1].src;
 
     if (currentScriptPath.length == 0) {
-        currentScriptPath = window.installPath + '/ac-angular-usuarios/includes/ac-usuarios.php';
+        currentScriptPath = window.installPath + '/mv-angular-usuarios/includes/mv-usuarios.php';
     }
 
-    angular.module('acUsuarios', [])
+    angular.module('mvUsuarios', [])
         .config(function Config($httpProvider, jwtInterceptorProvider) {
             jwtInterceptorProvider.tokenGetter = [function () {
                 return localStorage.getItem(window.app);
@@ -44,18 +44,18 @@
                 'social': '<',
                 'register': '<'
             },
-            templateUrl: window.installPath + '/ac-angular-usuarios/ac-usuarios-login.html',
-            controller: AcLoginController
+            templateUrl: window.installPath + '/mv-angular-usuarios/mv-usuarios-login.html',
+            controller: MvLoginController
         }
     }
 
-    AcLoginController.$inject = ["UserService", '$location', '$rootScope', 'SucursalesService'];
+    MvLoginController.$inject = ["UserService", '$location', '$rootScope', 'SucursalesService'];
     /**
      * @param UserService
      * @param $location
      * @constructor
      */
-    function AcLoginController(UserService, $location, $rootScope, SucursalesService) {
+    function MvLoginController(UserService, $location, $rootScope, SucursalesService) {
         var vm = this;
         vm.email = '';
         vm.password = '';
@@ -103,18 +103,26 @@
             bindings: {
                 'redirect': '='
             },
-            //template: '<button class="ac-usuarios-logout" ng-click="$ctrl.logout()">{{"LOGOUT"|xlat}}</button>',
+            //template: '<button class="mv-usuarios-logout" ng-click="$ctrl.logout()">{{"LOGOUT"|xlat}}</button>',
             template: '<img class="btn-img" style="margin: 5px;" src="images/logout.png" ng-click="$ctrl.logout()" width="30" height="30">',
-            controller: AcLogoutController
+            controller: MvLogoutController
         }
     }
 
+<<<<<<< HEAD:ac-usuarios.js
     AcLogoutController.$inject = ["UserService", '$rootScope', '$timeout'];
+=======
+    MvLogoutController.$inject = ["UserService", '$rootScope'];
+>>>>>>> 505502ca7a2391b264dfcff1ad8a5a91f0a4a629:mv-usuarios.js
     /**
      * @param $scope
      * @constructor
      */
+<<<<<<< HEAD:ac-usuarios.js
     function AcLogoutController(UserService, $rootScope, $timeout) {
+=======
+    function MvLogoutController(UserService, $rootScope) {
+>>>>>>> 505502ca7a2391b264dfcff1ad8a5a91f0a4a629:mv-usuarios.js
         var vm = this;
         $timeout(function () {
             vm.dir = (vm.redirect == undefined) ? '/logout' : vm.redirect;
@@ -130,12 +138,12 @@
     }
 
 
-    UserService.$inject = ['$http', 'UserVars', '$cacheFactory', 'AcUtils', 'jwtHelper', 'auth', 'ErrorHandler', '$q', '$location', 'AcUtilsGlobals'];
-    function UserService($http, UserVars, $cacheFactory, AcUtils, jwtHelper, auth, ErrorHandler, $q, $location, AcUtilsGlobals) {
+    UserService.$inject = ['$http', 'UserVars', '$cacheFactory', 'MvUtils', 'jwtHelper', 'auth', 'ErrorHandler', '$q', '$location', 'MvUtilsGlobals'];
+    function UserService($http, UserVars, $cacheFactory, MvUtils, jwtHelper, auth, ErrorHandler, $q, $location, MvUtilsGlobals) {
         //Variables
         var service = {};
 
-        var url = currentScriptPath.replace('ac-usuarios.js', '/includes/ac-usuarios.php');
+        var url = currentScriptPath.replace('mv-usuarios.js', '/includes/mv-usuarios.php');
 
         //Function declarations
         service.getLogged = getLogged;
@@ -229,7 +237,7 @@
          */
         function getByParams(params, values, exact_match) {
             return get().then(function (data) {
-                return AcUtils.getByParams(params, values, exact_match, data);
+                return MvUtils.getByParams(params, values, exact_match, data);
             }).then(function (data) {
                 return data;
             });
@@ -259,9 +267,11 @@
          * @param callback
          * @description: Retorna todos los usuario de la base.
          */
-        function get() {
-            AcUtilsGlobals.startWaiting();
-            var urlGet = url + '?function=get';
+        function get(rol_id) {
+            MvUtilsGlobals.startWaiting();
+            //var urlGet = url + '?function=get';
+            //var urlGet = url + '?function=get&all=' + UserVars.all;
+            var urlGet = url + '?function=get&rol_id=' + rol_id;
             var $httpDefaultCache = $cacheFactory.get('$http');
             var cachedData = [];
 
@@ -274,7 +284,7 @@
                     var deferred = $q.defer();
                     cachedData = $httpDefaultCache.get(urlGet);
                     deferred.resolve(cachedData);
-                    AcUtilsGlobals.stopWaiting();
+                    MvUtilsGlobals.stopWaiting();
                     return deferred.promise;
                 }
             }
@@ -283,18 +293,20 @@
             return $http.get(urlGet, {cache: true})
                 .then(function (response) {
 
+                    /*
                     for (var i = 0; i < response.data.length; i++) {
                         response.data[i].tipo_doc = '' + response.data[i].tipo_doc;
                     }
+                    */
 
                     $httpDefaultCache.put(urlGet, response.data);
                     UserVars.clearCache = false;
                     UserVars.paginas = (response.data.length % UserVars.paginacion == 0) ? parseInt(response.data.length / UserVars.paginacion) : parseInt(response.data.length / UserVars.paginacion) + 1;
-                    AcUtilsGlobals.stopWaiting();
+                    MvUtilsGlobals.stopWaiting();
                     return response.data;
                 })
                 .catch(function (response) {
-                    AcUtilsGlobals.stopWaiting();
+                    MvUtilsGlobals.stopWaiting();
                     ErrorHandler(response);
                 });
 
@@ -657,6 +669,8 @@
         this.user_social = {};
         this.token_social = '';
 
+        // Indica si debe traer todos los usuarios o solo los activos, por defecto, solo activos
+        this.all = false;
         // Indica si se debe limpiar el cach� la pr�xima vez que se solicite un get
         this.clearCache = true;
 

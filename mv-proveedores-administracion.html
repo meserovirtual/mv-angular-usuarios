@@ -1,0 +1,132 @@
+<div class="container" ng-class="{'form-container':$ctrl.detailsOpen}">
+    <div ng-class="{'form-lista':$ctrl.detailsOpen}">
+        <div class="buscador-container">
+            <div class="input">
+                <input type="text" class="buscador" ng-model="$ctrl.filtro"
+                       placeholder="Buscar Proveedor" style="width: 100%">
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Razón Social</th>
+                <th>CUIT</th>
+                <th>{{'PHONE'|xlat}}</th>
+                <th>Activo</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="row in $ctrl.usuarios | filter:$ctrl.filtro | limitTo:$ctrl.limit:$ctrl.start"
+                ng-click="row.rol_id=''+row.rol_id;$ctrl.usuario=row;$ctrl.status=($ctrl.usuario.status == 1 ? true : false);
+                $ctrl.detailsOpen=true;$ctrl.update=true;">
+                <td class="">{{row.nombre}}</td>
+                <td class="">{{row.nro_doc}}</td>
+                <td class="">{{row.telefono}}</td>
+                <td class="">{{row.status == 0 ? 'N' : 'S'}}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="4">
+                    <div class="table-td">
+                            <span>
+                                <button class="paginacion-primera" ng-click="$ctrl.first();"></button>
+                                <button class="paginacion-ant" ng-click="$ctrl.prev();"></button>
+                            </span>
+                            <span class="paginacion-paginas">
+                                <span>{{'PAGE' | xlat}} {{$ctrl.pagina}} {{'OF' | xlat}} {{$ctrl.paginas}}</span>
+                            </span>
+                            <span class="paginacion-go-to">{{'GO_TO' | xlat}}
+                                <input type="number" ng-model="$ctrl.pagina" ng-keyup="$ctrl.goToPagina();"
+                                       class="input-paginacion">
+                            </span>
+                            <span>
+                                <button class="paginacion-sig" ng-click="$ctrl.next();"></button>
+                                <button class="paginacion-ultima"ng-click="$ctrl.last();"></button>
+                            </span>
+                    </div>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+        <div class="botonera">
+            <button type="button" class="boton-agregar" ng-click="$ctrl.cancel();$ctrl.detailsOpen=true;" title="Nuevo">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <form class="form-abm" form-id="abm-detalle" ng-class="{'form-open':$ctrl.detailsOpen}">
+        <div class="detalle-container">
+            <h2>Nuevo Proveedor</h2>
+
+            <div class="mv-col">
+                <div class="input" data-tip="Razón Social">
+                    <input id="nombre" type="text" ng-model="$ctrl.usuario.nombre" placeholder="Razón Social"
+                           maxlength="100"/>
+                </div>
+                <div class="input" data-tip="CUIT xxxxxxxxxxx">
+                    <input id="nro_doc" type="text" ng-model="$ctrl.usuario.nro_doc" placeholder="CUIT"
+                           autocomplete="off" maxlength="15"/>
+                </div>
+            </div>
+            <div class="mv-col">
+                <div class="input" data-tip="Teléfono - (xxx)xxx-xxxx / xxx-xxx-xxxx">
+                    <input id="telefono" type="text" ng-model="$ctrl.usuario.telefono" placeholder="{{'PHONE'|xlat}}"
+                           autocomplete="off" maxlength="15"/>
+                </div>
+                <div class="input" data-tip="Mail xxx@xxx.com">
+                    <input id="email" type="text" ng-model="$ctrl.usuario.mail" placeholder="{{'EMAIL'|xlat}}"
+                           autocomplete="off" maxlength="100"/>
+                </div>
+            </div>
+            <!--<div class="mv-col">
+                <div class="input" data-tip="web">
+                    <input id="web" type="text" ng-model="$ctrl.usuario.direcciones[0].calle" placeholder="{{'ADDRESS'|xlat}}"
+                           autocomplete="off" maxlength="150"/>
+                </div>
+            </div>-->
+            <div class="mv-col">
+                <div class="input" data-tip="Dirección">
+                    <input id="direccion" type="text" ng-model="$ctrl.usuario.direcciones[0].calle" placeholder="{{'ADDRESS'|xlat}}"
+                           autocomplete="off" maxlength="100"/>
+                </div>
+                <div class="input" data-tip="Número">
+                    <input id="dir_nro" type="number" ng-model="$ctrl.usuario.direcciones[0].nro" placeholder="Número"
+                           autocomplete="off" max="99999" />
+                </div>
+            </div>
+            <div class="mv-col">
+                <div class="input" data-tip="Piso">
+                    <input id="piso" type="text" ng-model="$ctrl.usuario.direcciones[0].piso" placeholder="Piso"
+                           autocomplete="off" maxlength="4"/>
+                </div>
+                <div class="input" data-tip="Puerta">
+                    <input id="puerta" type="text" ng-model="$ctrl.usuario.direcciones[0].puerta" placeholder="Puerta"
+                           autocomplete="off" maxlength="4"/>
+                </div>
+            </div>
+            <div class="mv-col">
+                <label class="label--checkbox" ng-click="$ctrl.status=!$ctrl.status" ng-if="$ctrl.update">
+                    <input type="checkbox" class="checkbox" id="check-status" ng-checked="$ctrl.status">Estado
+                </label>
+            </div>
+
+            <div class="botonera">
+                <button type="button" class="boton-ok" ng-click="$ctrl.save();" title="Guardar">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="boton-cancelar" ng-click="$ctrl.cancel();"
+                        title="Cancelar">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="boton-eliminar" ng-click="$ctrl.remove();"
+                        title="Borrar">
+                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+    </form>
+</div>

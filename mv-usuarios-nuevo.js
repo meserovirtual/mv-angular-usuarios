@@ -1,26 +1,26 @@
 (function () {
     'use strict';
 
-    angular.module('acUsuariosNuevo', [])
-        .component('acUsuariosNuevo', acUsuariosNuevo());
+    angular.module('mvUsuariosNuevo', [])
+        .component('mvUsuariosNuevo', mvUsuariosNuevo());
 
-    function acUsuariosNuevo() {
+    function mvUsuariosNuevo() {
         return {
             bindings: {
                 usuario: '=',
                 visibility: '='
             },
-            templateUrl: window.installPath + '/ac-angular-usuarios/ac-usuarios-nuevo.html',
-            controller: AcUsuariosController
+            templateUrl: window.installPath + '/mv-angular-usuarios/mv-usuarios-nuevo.html',
+            controller: MvUsuariosController
         }
     }
 
-    AcUsuariosController.$inject = ['UserService'];
+    MvUsuariosController.$inject = ['UserService'];
     /**
      * @param AcUsuarios
      * @constructor
      */
-    function AcUsuariosController(UserService) {
+    function MvUsuariosController(UserService) {
         var vm = this;
 
         vm.usuarios = [];
