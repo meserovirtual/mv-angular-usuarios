@@ -109,22 +109,23 @@
         }
     }
 
-    AcLogoutController.$inject = ["UserService", '$rootScope'];
+    AcLogoutController.$inject = ["UserService", '$rootScope', '$timeout'];
     /**
      * @param $scope
      * @constructor
      */
-    function AcLogoutController(UserService, $rootScope) {
+    function AcLogoutController(UserService, $rootScope, $timeout) {
         var vm = this;
-        vm.dir = (vm.redirect == undefined) ? '/logout' : vm.redirect;
-        vm.logout = logout;
-
-        function logout() {
-            UserService.logout(vm.dir).then(function (data) {
-                $rootScope.$broadcast('login-error');
-                console.log(data);
-            });
-        }
+        $timeout(function () {
+            vm.dir = (vm.redirect == undefined) ? '/logout' : vm.redirect;
+            vm.logout = logout;
+            function logout() {
+                UserService.logout(vm.dir).then(function (data) {
+                    $rootScope.$broadcast('login-error');
+                    console.log(data);
+                });
+            }
+        }, 100);
 
     }
 
