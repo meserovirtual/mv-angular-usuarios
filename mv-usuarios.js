@@ -109,12 +109,12 @@
         }
     }
 
-    AcLogoutController.$inject = ["UserService", '$rootScope', '$timeout'];
+    MvLogoutController.$inject = ["UserService", '$rootScope', '$timeout'];
     /**
      * @param $scope
      * @constructor
      */
-    function AcLogoutController(UserService, $rootScope, $timeout) {
+    function MvLogoutController(UserService, $rootScope, $timeout) {
         var vm = this;
         $timeout(function () {
             vm.dir = (vm.redirect == undefined) ? '/logout' : vm.redirect;
