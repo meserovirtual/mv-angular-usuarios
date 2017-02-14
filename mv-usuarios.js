@@ -69,7 +69,7 @@
         SucursalesService.get().then(function (data) {
             vm.sucursales = data;
             vm.sucursal = data[0];
-            vm.caja = vm.sucursal.cajas[0];
+            vm.caja = (vm.sucursal.cajas != undefined) ? vm.sucursal.cajas[0] : {};
         });
 
         function login() {
@@ -286,10 +286,10 @@
                 .then(function (response) {
 
                     /*
-                    for (var i = 0; i < response.data.length; i++) {
-                        response.data[i].tipo_doc = '' + response.data[i].tipo_doc;
-                    }
-                    */
+                     for (var i = 0; i < response.data.length; i++) {
+                     response.data[i].tipo_doc = '' + response.data[i].tipo_doc;
+                     }
+                     */
 
                     $httpDefaultCache.put(urlGet, response.data);
                     UserVars.clearCache = false;
