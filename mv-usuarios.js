@@ -209,13 +209,13 @@
          * @param callback
          * @returns {*}
          */
-        function getDeudores(callback) {
+        function getDeudores() {
             return $http.post(url, {'function': 'getDeudores'})
-                .success(function (data) {
-                    callback(data);
+                .then(function (data) {
+                    return data;
                 })
-                .error(function (data) {
-                    callback(data);
+                .catch(function (data) {
+                    ErrorHandler(data);
                 });
         }
 
