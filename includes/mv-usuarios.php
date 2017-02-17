@@ -43,19 +43,16 @@ class Usuarios extends Main
      */
     function getDeudores()
     {
-
-
-        $db = new MysqliDb();
+        $db = self::$instance->db;
         $deudores = array();
 
         $results = $db->rawQuery('Select usuario_id, nombre, apellido, saldo, 0 asientos from usuarios where saldo <= -1;');
-
 
         foreach ($results as $key => $row) {
 //        $movimientos = $db->rawQuery("select movimiento_id from detallesmovimientos where detalle_tipo_id = 3 and valor = ".$row["cliente_id"].");");
             $asientos = $db->rawQuery("select asiento_id, fecha, cuenta_id, sucursal_id, importe, movimiento_id, 0 detalles
 from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
-(select movimiento_id from detallesmovimientos where detalle_tipo_id = 3 and valor = " . $row["cliente_id"] . ");");
+(select movimiento_id from detallesmovimientos where detalle_tipo_id = 3 and valor = " . $row["usuario_id"] . ");");
 
             foreach ($asientos as $key_mov => $movimento) {
                 $detalles = $db->rawQuery("select detalle_tipo_id,
@@ -69,7 +66,6 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
 
             $results[$key]["asientos"] = $asientos;
 //        $row["detalles"] = $detalle;
-
 //        array_push($deudores, $row);
         }
 
