@@ -211,11 +211,13 @@
          */
         function getDeudores() {
             return $http.post(url, {'function': 'getDeudores'})
-                .then(function (data) {
-                    return data;
+                .then(function (response) {
+                    UserVars.clearCache = false;
+                    UserVars.paginas = (response.data.length % UserVars.paginacion == 0) ? parseInt(response.data.length / UserVars.paginacion) : parseInt(response.data.length / UserVars.paginacion) + 1;
+                    return response;
                 })
-                .catch(function (data) {
-                    ErrorHandler(data);
+                .catch(function (response) {
+                    ErrorHandler(response);
                 });
         }
 

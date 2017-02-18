@@ -46,7 +46,7 @@ class Usuarios extends Main
         $db = self::$instance->db;
         $deudores = array();
 
-        $results = $db->rawQuery('Select usuario_id, nombre, apellido, saldo, 0 asientos from usuarios where saldo <= -1;');
+        $results = $db->rawQuery('Select usuario_id, nombre, apellido, saldo, telefono, mail, nro_doc, 0 asientos from usuarios where saldo <= -1;');
 
         foreach ($results as $key => $row) {
 //        $movimientos = $db->rawQuery("select movimiento_id from detallesmovimientos where detalle_tipo_id = 3 and valor = ".$row["cliente_id"].");");
