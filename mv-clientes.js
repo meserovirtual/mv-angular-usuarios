@@ -44,36 +44,29 @@
                 'social': '<',
                 'register': '<'
             },
-            templateUrl: window.installPath + '/mv-angular-usuarios/mv-usuarios-login.html',
+            templateUrl: window.installPath + '/mv-angular-usuarios/mv-clientes-login.html',
             controller: MvLoginController
         }
     }
 
-    MvLoginController.$inject = ["UserService", '$location', '$rootScope', 'SucursalesService'];
+    MvLoginController.$inject = ["UserService", '$location', '$rootScope'];
     /**
      * @param UserService
      * @param $location
      * @constructor
      */
-    function MvLoginController(UserService, $location, $rootScope, SucursalesService) {
+    function MvLoginController(UserService, $location, $rootScope) {
         var vm = this;
         vm.email = '';
         vm.password = '';
-        vm.sucursal = {sucursal_id: 2};
-        vm.caja = {caja_id: 1};
         vm.dir = (vm.redirect == undefined) ? '/' : vm.redirect;
         vm.login = login;
         vm.loginFacebook = loginFacebook;
         vm.loginGoogle = loginGoogle;
 
-        SucursalesService.get().then(function (data) {
-            vm.sucursales = data;
-            vm.sucursal = data[0];
-            vm.caja = (vm.sucursal.cajas != undefined) ? vm.sucursal.cajas[0] : {};
-        });
 
         function login() {
-            UserService.login(vm.email, vm.password, vm.sucursal.sucursal_id, vm.caja.caja_id).then(function (data) {
+            UserService.login(vm.email, vm.password).then(function (data) {
                 if (data.status == 200) {
                     $rootScope.$broadcast('login-success');
                     $location.path(vm.dir);
@@ -104,7 +97,7 @@
                 'redirect': '='
             },
             //template: '<button class="mv-usuarios-logout" ng-click="$ctrl.logout()">{{"LOGOUT"|xlat}}</button>',
-            template: '<img class="btn-img" style="margin: 5px;" src="images/logout.svg" ng-click="$ctrl.logout()" width="30" height="30">',
+            template: '<img class="btn-img" style="margin: 5px;" src="images/logout.ico" ng-click="$ctrl.logout()" width="30" height="30">',
             controller: MvLogoutController
         }
     }
@@ -142,6 +135,9 @@
         service.getFromToken = getFromToken;
         service.setLogged = setLogged;
         service.checkLastLogin = checkLastLogin;
+        service.generateSession = generateSession;
+        service.getDataFromToken = getDataFromToken;
+        service.verifyTokenExp = verifyTokenExp;
 
         service.create = create;
         service.createFromSocial = createFromSocial;
@@ -189,6 +185,30 @@
         }
 
 
+        function verifyTokenExp(){
+
+            var globals = localStorage.getItem(window.app);
+
+
+        }
+
+        function getDataFromToken(field){
+
+            var globals = localStorage.getItem(window.app);
+
+            if (globals !== undefined && globals !== null) {
+                if(field == undefined){
+                    return (jwtHelper.decodeToken(globals)).data;
+                }else{
+                    return (jwtHelper.decodeToken(globals)).data[field];
+                }
+            } else {
+                logout('/login');
+                return false;
+            }
+        }
+
+
         /**
          * @description Obtiene un deudor espec�fico
          * @param id
@@ -215,6 +235,22 @@
                     UserVars.clearCache = false;
                     UserVars.paginas = (response.data.length % UserVars.paginacion == 0) ? parseInt(response.data.length / UserVars.paginacion) : parseInt(response.data.length / UserVars.paginacion) + 1;
                     return response;
+                })
+                .catch(function (response) {
+                    ErrorHandler(response);
+                });
+        }
+        /**
+         * Obtiene todo los deudores
+         * @param mesa_id
+         * @returns {*}
+         */
+        function generateSession(mesa_id) {
+            return $http.post(url, {'function': 'generateSession', 'mesa_id': mesa_id})
+                .then(function (response) {
+                    localStorage.setItem(window.app, response.data);
+                    // response.data.status = response.status;
+                    return response.data;
                 })
                 .catch(function (response) {
                     ErrorHandler(response);
@@ -346,13 +382,13 @@
          * Realiza logout
          */
         function logout(path) {
+            localStorage.removeItem(window.app);
             return $http.post(url,
                 {
                     'function': 'logout'
                 })
                 .then(function (response) {
-                    localStorage.removeItem(window.app);
-                    UserVars.clearCache = true;
+
                     $location.path(path);
                     return response.data;
                 })
@@ -371,15 +407,13 @@
          * @param caja_id
          * @returns {*}
          */
-        function login(mail, password, sucursal_id, caja_id) {
+        function login(mail, password) {
 
             return $http.post(url,
                 {
-                    'function': 'login',
+                    'function': 'loginCliente',
                     'mail': mail,
-                    'password': password,
-                    'sucursal_id': sucursal_id,
-                    'caja_id': caja_id
+                    'password': password
                 })
                 .then(function (response) {
                     localStorage.setItem(window.app, response.data.token);

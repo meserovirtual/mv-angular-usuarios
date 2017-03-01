@@ -36,6 +36,30 @@ class Usuarios extends Main
         }
     }
 
+    /**
+     * Genera una session para la mesa que lo esté solicitando, siempre tiene que entrar primero por acá.
+     * Si el usuario cambia de mesa, pero ya está loggeado tiene que cambiar la session pero mantener el login,
+     * por lo que debería generar un nuevo token y devolverlo
+     * @param $mesa_id
+     * TODO:
+     *  - Se deberá agregar un tiempo de expiración al session
+     */
+    function generateSession($params)
+    {
+        $requestHeaders = apache_request_headers();
+        $authorizationHeader = isset($requestHeaders['Authorization']) ? $requestHeaders['Authorization'] : null;
+        if ($authorizationHeader == null) {
+            // tengo que generar la session y devolverla
+            $empty_user = array('id' => '', 'nombre' => '', 'apellido' => '', 'mail' => '', 'rol' => '');
+            $session_id = generatePushId();
+            $token = self::createTokenCliente($empty_user, $params["mesa_id"], $session_id);
+        } else {
+            // tengo que modificar la mesa y devolver el nuevo token
+
+        }
+
+        echo $token;
+    }
 
     /**
      * @description Obtiene todo los deudores.
@@ -165,7 +189,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
      * @return: JWT:string de token
      * todo: Agregar tiempos de expiración. Evaluar si hay que devolver algún dato dentro de data.
      */
-    function createToken($user, $sucursal_id, $caja_id)
+    function createToken($user, $sucursal_id, $caja_id, $session_id = '')
     {
 
         $tokenId = base64_encode(mcrypt_create_iv(32));
@@ -193,7 +217,57 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                 'mail' => $user["mail"], // User name
                 'sucursal_id' => $sucursal_id, // User name
                 'caja_id' => $caja_id, // User name
-                'rol' => $user["rol_id"] // Rol
+                'rol' => $user["rol_id"], // Rol
+                'session_id' => $session_id // Session
+            ]
+        ];
+
+        global $secret;
+        return JWT::encode($data, $secret);
+        /*
+         * More code here...
+         */
+    }
+
+    /* @name: createToken
+     * @param
+     * @description: Envia al usuario que lo solicita, un password aleatorio.
+     * @return: JWT:string de token
+     * todo: Agregar tiempos de expiración. Evaluar si hay que devolver algún dato dentro de data.
+     */
+    function createTokenCliente($user, $mesa_id, $session_id = '')
+    {
+
+        $tokenId = base64_encode(mcrypt_create_iv(32));
+        $issuedAt = time();
+        $notBefore = $issuedAt + 10;             //Adding 10 seconds
+        $expire = $notBefore + 60;            // Adding 60 seconds
+        global $serverName; // Retrieve the server name from config file
+        $aud = $serverName;
+//        $serverName = $config->get('serverName'); // Retrieve the server name from config file
+
+        if($session_id == ''){
+            $session_id = generatePushId();
+        }
+
+        /*
+         * Create the token as an array
+         */
+        $data = [
+            'iat' => $issuedAt,         // Issued at: time when the token was generated
+            'jti' => $tokenId,          // Json Token Id: an unique identifier for the token
+            'iss' => $serverName,       // Issuer
+            'nbf' => $notBefore,        // Not before
+            'exp' => $expire,           // Expire
+            'aud' => $aud,           // Expire
+            'data' => [                  // Data related to the signer user
+                'id' => $user["usuario_id"], // userid from the users table
+                'nombre' => $user["nombre"], // User name
+                'apellido' => $user["apellido"], // User name
+                'mail' => $user["mail"], // User name
+                'mesa_id' => $mesa_id, // User name
+                'rol' => $user["rol_id"], // Rol
+                'session_id' => $session_id // Session
             ]
         ];
 
@@ -368,6 +442,69 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
      * @description: Valida el ingreso de un usuario.
      * todo: Sacar dirección y crear sus propias clases dentro de este mismo módulo.
      */
+    function loginCliente($params)
+    {
+
+
+        $db = self::$instance->db;
+//        $db->where("mail", $params["mail"]);
+//
+//        $db->join("direcciones d", "d.usuario_id=u.usuario_id", "LEFT");
+//        $results = $db->get("usuarios u");
+
+        $results = $db->rawQuery('SELECT u.usuario_id, u.nombre, apellido, mail, rol_id, password, tipo_doc, nro_doc, marcado, saldo, social_login, status FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = "' . $params['mail'] . '"');
+
+
+        global $jwt_enabled;
+//        return;
+
+        if ($db->count > 0) {
+
+            if ($results[0]['social_login'] !== 0) {
+                echo json_encode(-1);
+                exit;
+            }
+            $hash = $results[0]['password'];
+            if (password_verify($params["password"], $hash)) {
+                $results[0]['password'] = '';
+                header('HTTP/1.0 200 Ok');
+                // Si la seguridad se encuentra habilitada, retorna el token y el usuario sin password
+                //$results[0]->sucursal = $sucursal_id; //-1 == web
+                //Comente la linea de arriba xq me saltaba error.
+                if ($results[0]['status'] == 0) {
+                    self::addLogin($results[0]['usuario_id'], getDataFromToken('mesa_id'), -1, 0);
+                    header('HTTP/1.0 500 Internal Server Error');
+                    echo "Usuario inhabilitado";
+                } else {
+                    if ($jwt_enabled) {
+                        echo json_encode(
+                            array(
+                                'token' => self::createTokenCliente($results[0], getDataFromToken('mesa_id'), getDataFromToken('session_id')),
+                                'user' => $results[0])
+                        );
+                    } else {
+                        echo json_encode(array('token' => '', 'user' => $results[0]));
+                    }
+                    self::addLogin($results[0]['usuario_id'], getDataFromToken('mesa_id'), -1, 1);
+                }
+            } else {
+                self::addLogin($results[0]['usuario_id'], getDataFromToken('mesa_id'), -1, 0);
+                header('HTTP/1.0 500 Internal Server Error');
+                echo "Password incorrecto";
+            }
+        } else {
+            header('HTTP/1.0 500 Internal Server Error');
+            echo "No existe el usuario.";
+        }
+    }
+
+    /* @name: login
+     * @param $mail
+     * @param $password
+     * @param $sucursal_id
+     * @description: Valida el ingreso de un usuario.
+     * todo: Sacar dirección y crear sus propias clases dentro de este mismo módulo.
+     */
     function login($params)
     {
         $db = self::$instance->db;
@@ -395,7 +532,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                 // Si la seguridad se encuentra habilitada, retorna el token y el usuario sin password
                 //$results[0]->sucursal = $sucursal_id; //-1 == web
                 //Comente la linea de arriba xq me saltaba error.
-                if($results[0]['status'] == 0) {
+                if ($results[0]['status'] == 0) {
                     self::addLogin($results[0]['usuario_id'], $params["sucursal_id"], $params["caja_id"], 0);
                     header('HTTP/1.0 500 Internal Server Error');
                     echo "Usuario inhabilitado";
@@ -498,7 +635,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
         $error_code = 0;
         $message = '';
 
-        if($user_decoded->nro_doc != "") {
+        if ($user_decoded->nro_doc != "") {
             $SQL = 'Select usuario_id from usuarios where nro_doc ="' . $user_decoded->nro_doc . '"';
 
             //$result = $db->rawQuery($SQL);
@@ -514,8 +651,8 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
             }
         }
 
-        if(!$error) {
-            if($user_decoded->mail != "") {
+        if (!$error) {
+            if ($user_decoded->mail != "") {
                 $SQL = 'Select usuario_id from usuarios where mail ="' . $user_decoded->mail . '"';
                 //$result = $db->rawQuery($SQL);
                 $db->rawQuery($SQL);
@@ -531,7 +668,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
             }
         }
 
-        if(!$error) {
+        if (!$error) {
             $db = self::$instance->db;
             $db->startTransaction();
             $user_decoded = self::checkUsuario(json_decode($params["user"]));
@@ -576,7 +713,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                     }
                 }
 
-                if($error) {
+                if ($error) {
                     $db->rollback();
                     header('HTTP/1.0 500 Internal Server Error');
                 } else {
@@ -694,7 +831,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
         $error_code = 0;
         $message = '';
 
-        if($user_decoded->nro_doc != "") {
+        if ($user_decoded->nro_doc != "") {
             $SQL = 'Select usuario_id from usuarios where nro_doc ="' . $user_decoded->nro_doc . '" AND usuario_id != "' . $user_decoded->usuario_id . '"';
             $db->rawQuery($SQL);
             if ($db->count > 0) {
@@ -707,8 +844,8 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
             }
         }
 
-        if(!$error) {
-            if($user_decoded->mail != "") {
+        if (!$error) {
+            if ($user_decoded->mail != "") {
                 $SQL = 'Select usuario_id from usuarios where mail ="' . $user_decoded->mail . '" AND usuario_id != "' . $user_decoded->usuario_id . '"';
                 $db->rawQuery($SQL);
                 if ($db->count > 0) {
@@ -722,7 +859,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
             }
         }
 
-        if(!$error) {
+        if (!$error) {
             $db = self::$instance->db;
             $db->startTransaction();
             $user_decoded = self::checkUsuario(json_decode($params["user"]));
@@ -770,7 +907,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                     }
                 }
 
-                if($error) {
+                if ($error) {
                     $db->rollback();
                     header('HTTP/1.0 500 Internal Server Error');
                 } else {
@@ -855,7 +992,8 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
      * @param $direcciones
      * @return mixed
      */
-    function checkDirecciones($direcciones) {
+    function checkDirecciones($direcciones)
+    {
         foreach ($direcciones as $direccion) {
             $direccion->usuario_id = (!array_key_exists("usuario_id", $direccion)) ? 0 : $direccion->usuario_id;
             $direccion->direccion_id = (!array_key_exists("direccion_id", $direccion)) ? 0 : $direccion->direccion_id;
