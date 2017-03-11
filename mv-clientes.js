@@ -203,7 +203,7 @@
                     return (jwtHelper.decodeToken(globals)).data[field];
                 }
             } else {
-                logout('/login');
+                //logout('/login');
                 return false;
             }
         }

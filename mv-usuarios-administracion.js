@@ -28,6 +28,8 @@
         vm.repeat_password = '';
         vm.detailsOpen = false;
         vm.update = false;
+        vm.perfiles = [];
+        vm.perfil = {};
 
         vm.save = save;
         vm.cancel = cancel;
@@ -36,7 +38,7 @@
         vm.remove = remove;
         vm.getPerfil = getPerfil;
         vm.cleanUsuario = cleanUsuario;
-
+        vm.setPerfil = setPerfil;
 
         var element1 = angular.element(document.getElementById('apellido'));
         var element2 = angular.element(document.getElementById('nombre'));
@@ -76,21 +78,31 @@
         });
 
 
+        vm.perfiles = [
+            {rol_id:0, nombre:'Administrador' },
+            {rol_id:1, nombre:'Mozo' },
+            {rol_id:4, nombre:'Caja' },
+            {rol_id:5, nombre:'Cocina' },
+            {rol_id:6, nombre:'Barra' }
+        ]
+
+        vm.perfil = vm.perfiles[0];
+
         function removeFocus() { }
 
         loadUsuarios();
 
         function loadUsuarios() {
             UserVars.all = true;
-            UserService.get('0,1').then(function (data) {
-                console.log(data);
+            UserService.get('0,1,4,5,6').then(function (data) {
+                //console.log(data);
                 setData(data);
             });
         }
 
 
         function save() {
-            console.log(vm.usuario);
+            //console.log(vm.usuario);
 
             if(vm.usuario.apellido === undefined || vm.usuario.apellido.length == 0) {
                 element1[0].classList.add('error-input');
@@ -142,6 +154,8 @@
             } else {
                 vm.usuario.status = vm.status ? 1 : 0;
             }
+            vm.usuario.rol_id = vm.perfil.rol_id;
+
             UserService.save(vm.usuario).then(function (data) {
                 console.log(data);
                 //vm.detailsOpen = (data === undefined || data < 0) ? true : false;
@@ -209,16 +223,27 @@
             loadUsuarios();
         }
 
+        function setPerfil(rol_id) {
+            for(var i=0; i < vm.perfiles.length; i++){
+                if(vm.perfiles[i].rol_id == rol_id){
+                    vm.perfil = vm.perfiles[i];
+                    break;
+                }
+            }
+        }
+
         function getPerfil(rol_id) {
             var perfil = '';
             if(rol_id == 0) {
                 perfil = 'Administrador';
             } else if(rol_id == 1) {
-                perfil = 'Usuarios';
-            } else if(rol_id == 2) {
-                perfil = 'Proveedor';
-            } else if(rol_id == 3) {
-                perfil = 'Clientes';
+                perfil = 'Mozo';
+            } else if(rol_id == 4) {
+                perfil = 'Caja';
+            } else if(rol_id == 5) {
+                perfil = 'Cocina';
+            } else if(rol_id == 6) {
+                perfil = 'Barra';
             }
             return perfil;
         }

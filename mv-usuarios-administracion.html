@@ -19,7 +19,7 @@
             <tbody>
             <tr ng-repeat="row in $ctrl.usuarios | filter:$ctrl.filtro | limitTo:$ctrl.limit:$ctrl.start"
                 ng-click="row.rol_id=''+row.rol_id;$ctrl.usuario=row;$ctrl.status=($ctrl.usuario.status == 1 ? true : false);
-                $ctrl.repeat_password='';$ctrl.detailsOpen=true;$ctrl.update=true;">
+                $ctrl.repeat_password='';$ctrl.detailsOpen=true;$ctrl.update=true;$ctrl.setPerfil($ctrl.usuario.rol_id);">
                 <td class="">{{row.nombre}}</td>
                 <td class="">{{row.mail}}</td>
                 <td class="">{{$ctrl.getPerfil(row.rol_id);}}</td>
@@ -27,9 +27,9 @@
             </tr>
             </tbody>
             <tfoot>
-                <tr>
-                    <td colspan="4">
-                        <div class="table-td">
+            <tr>
+                <td colspan="4">
+                    <div class="table-td">
                             <span>
                                 <button class="paginacion-primera" ng-click="$ctrl.first();"></button>
                                 <button class="paginacion-ant" ng-click="$ctrl.prev();"></button>
@@ -45,9 +45,9 @@
                                 <button class="paginacion-sig" ng-click="$ctrl.next();"></button>
                                 <button class="paginacion-ultima"ng-click="$ctrl.last();"></button>
                             </span>
-                        </div>
-                    </td>
-                </tr>
+                    </div>
+                </td>
+            </tr>
             </tfoot>
         </table>
         <div class="botonera">
@@ -86,19 +86,28 @@
                     <input id="email" type="text" ng-model="$ctrl.usuario.mail" placeholder="{{'EMAIL'|xlat}}"
                            autocomplete="off" maxlength="100"/>
                 </div>
-                <div class="mdl-selectfield">
-                    <label>Perfil</label>
-                    <select name="destacado" id="destacado" ng-model="$ctrl.usuario.rol_id" class="browser-default">
-                        <option value="" disabled selected>Perfil</option>
-                        <option value="0" >Administrador</option>
-                        <option value="1" selected>Usuario</option>
-                    </select>
+                <div class="input" data-tip="Documento">
+                    <input id="nro_doc" type="text" ng-model="$ctrl.usuario.nro_doc" placeholder="Documento"/>
                 </div>
             </div>
             <div class="mv-col">
                 <div class="input" data-tip="Teléfono - (xxx)xxx-xxxx / xxx-xxx-xxxx">
                     <input id="telefono" type="text" ng-model="$ctrl.usuario.telefono" placeholder="{{'PHONE'|xlat}}"
                            autocomplete="off" maxlength="15"/>
+                </div>
+                <div class="mdl-selectfield">
+                    <label>Perfil</label>
+                    <!--
+                    <select name="destacado" id="destacado" ng-model="$ctrl.usuario.rol_id" class="browser-default">
+                        <option value="" disabled selected>Perfil</option>
+                        <option value="0" >Administrador</option>
+                        <option value="1" selected>Usuario</option>
+                    </select>
+                    -->
+                    <select id="rol_id" ng-model="$ctrl.perfil"
+                            ng-options="perfil.nombre  for perfil in $ctrl.perfiles"
+                            class="browser-default">
+                    </select>
                 </div>
             </div>
             <div class="mv-col">
