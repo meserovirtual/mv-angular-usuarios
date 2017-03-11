@@ -199,11 +199,13 @@
             } else {
                 var result = confirm('¿Esta seguro que desea eliminar al usuario seleccionado?');
                 if(result) {
-                    UserService.remove(vm.usuario.usuario_id, function(data){
+                    UserService.remove(vm.usuario.usuario_id).then(function(data){
                         vm.detailsOpen = false;
                         cleanUsuario();
                         loadUsuarios();
                         MvUtils.showMessage('success', 'La registro se borro satisfactoriamente');
+                    }).catch(function(data){
+                        console.log(data);
                     });
                 }
             }

@@ -242,18 +242,17 @@
          * @param usuario_id, callback
          * @description: Elimina el usuario seleccionado.
          */
-        function remove(usuario_id, callback) {
+        function remove(usuario_id) {
             return $http.post(url,
                 {'function': 'remove', 'usuario_id': usuario_id})
-                .success(function (data) {
+                .then(function (data) {
                     //console.log(data);
-                    if (data !== 'false') {
-                        UserVars.clearCache = true;
-                        callback(data);
-                    }
+                    UserVars.clearCache = true;
+                    return data;
                 })
-                .error(function (data) {
-                    callback(data);
+                .catch(function (data) {
+                    ProductVars.clearCache = true;
+                    ErrorHandler(data)
                 })
         }
 
