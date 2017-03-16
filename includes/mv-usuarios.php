@@ -738,7 +738,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
 
         //echo json_encode($error_code);
         //echo json_encode(['error' => $error, 'results' => $error_code]);
-        echo json_encode(['error' => $error, 'message' => $message]);
+        echo json_encode(['usuario_id' => $result, 'error' => $error, 'message' => $message]);
     }
 
     /*
