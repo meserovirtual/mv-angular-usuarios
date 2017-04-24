@@ -1,0 +1,95 @@
+<div class="container" ng-class="{'form-container':$ctrl.detailsOpen}">
+    <div ng-class="{'form-lista':$ctrl.detailsOpen}">
+        <div class="buscador-container">
+            <div class="input">
+                <input type="text" class="buscador" ng-model="$ctrl.filtro"
+                       placeholder="Buscar Sucursal" style="width: calc(100% - 10px)">
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Apellido</th>
+                <th>Nombre</th>
+                <th>Saldo</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="row in $ctrl.usuarios | filter:$ctrl.filtro | limitTo:$ctrl.limit:$ctrl.start"
+                ng-click="row.usuario_id=''+row.usuario_id;$ctrl.usuario=row;$ctrl.detailsOpen=true;">
+                <td class="">{{row.apellido}}</td>
+                <td class="">{{row.nombre}}</td>
+                <td class="">{{row.saldo}}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3">
+                    <div class="table-td">
+                    <span>
+                        <button class="paginacion-primera" ng-click="$ctrl.first();"></button>
+                        <button class="paginacion-ant" ng-click="$ctrl.prev();"></button>
+                    </span>
+                    <span class="paginacion-paginas">
+                        <span>{{'PAGE' | xlat}} {{$ctrl.pagina}} {{'OF' | xlat}} {{$ctrl.paginas}}</span>
+                    </span>
+                    <span class="paginacion-go-to">{{'GO_TO' | xlat}}
+                        <input type="number" ng-model="$ctrl.pagina" ng-keyup="$ctrl.goToPagina();"
+                               class="input-paginacion">
+                    </span>
+                    <span>
+                        <button class="paginacion-sig" ng-click="$ctrl.next();"></button>
+                        <button class="paginacion-ultima"ng-click="$ctrl.last();"></button>
+                    </span>
+                    </div>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+        <!--<div class="botonera">
+            <button type="button" class="boton-agregar" ng-click="$ctrl.usuario={};$ctrl.detailsOpen=true;" title="Detalle">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
+        </div>-->
+    </div>
+
+    <form class="form-abm" form-id="abm-detalle" ng-class="{'form-open':$ctrl.detailsOpen}">
+        <div class="detalle-container" >
+            <h2>Detalle Deudores</h2>
+
+            <div class="mv-col">
+                <div class="input" data-tip="Apellido">
+                    <input id="apellido" type="text" ng-model="$ctrl.usuario.apellido" class="readonly" readonly />
+                </div>
+                <div class="input" data-tip="Nombre">
+                    <input id="nombre" type="text" ng-model="$ctrl.usuario.nombre" class="readonly" readonly />
+                </div>
+            </div>
+            <div class="mv-col">
+                <div class="input" data-tip="Saldo">
+                    <input id="saldo" type="text" ng-model="$ctrl.usuario.saldo"  class="readonly" readonly />
+                </div>
+                <div class="input" data-tip="Teléfono">
+                    <input id="telefono" type="text" ng-model="$ctrl.usuario.telefono"  class="readonly" readonly />
+                </div>
+            </div>
+            <div class="mv-col">
+                <div class="input" data-tip="Mail">
+                    <input id="mail" type="text" ng-model="$ctrl.usuario.mail"  class="readonly" readonly />
+                </div>
+                <div class="input" data-tip="Documento">
+                    <input id="documento" type="text" ng-model="$ctrl.usuario.nro_doc"  class="readonly" readonly />
+                </div>
+            </div>
+
+            <div class="botonera">
+                <button type="button" class="boton-cancelar" ng-click="$ctrl.cancel();"
+                        title="Cancelar">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+</div>
