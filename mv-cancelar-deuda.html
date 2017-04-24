@@ -1,0 +1,55 @@
+<div class="title">
+    <h1>Confirmar Pago a Proveedores</h1></div>
+<div class="v-spacer"></div>
+<form ng-controller="CancelaDeudaController  as cancelaDeudaCtrl"
+      name="cancelaDeudaForm" novalidate>
+
+    <div style="display: flex;" >
+        <div>
+            <input type="text" ng-model="cancelaDeudaCtrl.comentario" ng-maxlength="100"
+                   required><br>
+            <label for="nombre">Comentario</label>
+        </div>
+
+        <div>
+            <input type="number" step="0.01" ng-model="cancelaDeudaCtrl.cliente.saldo"
+                   required><br>
+            <label for="importe">Importe</label>
+
+        </div>
+    </div>
+
+    <div>
+
+        <!--Formas de pago-->
+        <!--01 - Efectivo-->
+        <!--02 - TD-->
+        <!--03 - TC-->
+        <!--04 - Transferencia CA-->
+        <!--05 - Transferencia CC-->
+        <!--05 - Caja General-->
+        <select name="" id="forma_pago" ng-model="cancelaDeudaCtrl.forma_pago">
+            <option value="01">Efectivo</option>
+            <option value="02">Débito</option>
+            <option value="03">Crédito</option>
+            <option value="04">Transferencia CA</option>
+            <option value="05">Transferencia CC</option>
+            <option value="08">Mercado Pago</option>
+        </select>
+        <br><label for="forma_pago">Forma de Pago</label>
+    </div>
+
+    <div>
+        <!--<input type="submit"-->
+        <!--ng-disabled="cancelaDeudaForm.user.$dirty && cancelaDeudaForm.user.$invalid ||-->
+        <!--cancelaDeudaForm.email.$dirty && cancelaDeudaForm.email.$invalid">-->
+        <div class="btn"><input type="submit" ng-click="cancelaDeudaCtrl.save();"
+                                ng-disabled="cancelaDeudaForm.$invalid" class="relieve-2 btn-ok btn-big" value="">
+            <label>Confirmar Pago</label>
+        </div>
+
+    </div>
+
+
+</form>
+
