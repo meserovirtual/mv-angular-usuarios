@@ -56,39 +56,7 @@
 
     <form class="form-abm" form-id="abm-detalle" ng-class="{'form-open':$ctrl.detailsOpen}">
         <div class="detalle-container" >
-            <h2>Detalle Deudores</h2>
-
-            <div class="mv-col">
-                <div class="input" data-tip="Apellido">
-                    <input id="apellido" type="text" ng-model="$ctrl.usuario.apellido" class="readonly" readonly />
-                </div>
-                <div class="input" data-tip="Nombre">
-                    <input id="nombre" type="text" ng-model="$ctrl.usuario.nombre" class="readonly" readonly />
-                </div>
-            </div>
-            <div class="mv-col">
-                <div class="input" data-tip="Saldo">
-                    <input id="saldo" type="text" ng-model="$ctrl.usuario.saldo"  class="readonly" readonly />
-                </div>
-                <div class="input" data-tip="Teléfono">
-                    <input id="telefono" type="text" ng-model="$ctrl.usuario.telefono"  class="readonly" readonly />
-                </div>
-            </div>
-            <div class="mv-col">
-                <div class="input" data-tip="Mail">
-                    <input id="mail" type="text" ng-model="$ctrl.usuario.mail"  class="readonly" readonly />
-                </div>
-                <div class="input" data-tip="Documento">
-                    <input id="documento" type="text" ng-model="$ctrl.usuario.nro_doc"  class="readonly" readonly />
-                </div>
-            </div>
-
-            <div class="botonera">
-                <button type="button" class="boton-cancelar" ng-click="$ctrl.cancel();"
-                        title="Cancelar">
-                    <i class="fa fa-times" aria-hidden="true"></i>
-                </button>
-            </div>
+            <mv-cancelar-deuda usuario="$ctrl.usuario"></mv-cancelar-deuda>
         </div>
     </form>
 

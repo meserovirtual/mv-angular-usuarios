@@ -166,9 +166,26 @@
         service.userExist = userExist;
         service.forgotPassword = forgotPassword;
         service.changePassword = changePassword;
+        service.actualizarSaldo = actualizarSaldo;
 
 
         return service;
+
+        function actualizarSaldo(usuario_id, saldo) {
+            return $http.post(url,
+                {
+                    'function': 'actualizarSaldo',
+                    'usuario_id': usuario_id,
+                    'saldo': saldo
+                }).then(function (data) {
+                    UserVars.clearCache = true;
+                    return data;
+                })
+                .catch(function (data) {
+                    UserVars.clearCache = true;
+                    ErrorHandler(data)
+                });
+        }
 
         //Functions
         /**

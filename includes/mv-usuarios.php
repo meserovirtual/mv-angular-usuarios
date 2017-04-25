@@ -952,6 +952,32 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
 
     }
 
+    function actualizarSaldo($params)
+    {
+        $db = self::$instance->db;
+        $error = false;
+        $message = '';
+
+        $db->where('usuario_id', $params["usuario_id"]);
+        $data = array(
+            'saldo' => $params["saldo"]
+        );
+
+        $result = $db->update('usuarios', $data);
+        if ($result) {
+            $db->commit();
+            header('HTTP/1.0 200 Ok');
+            $message = 'La operación se realizo satisfactoriamente';
+            $error = false;
+        } else {
+            $db->rollback();
+            $message = 'Error guardando el dato';
+            $error = true;
+        }
+
+        echo json_encode(['error' => $error, 'message' => $message]);
+    }
+
     /**
      * @description Verifica todos los campos de usuario para que existan
      * @param $usuario
