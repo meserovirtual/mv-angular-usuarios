@@ -333,6 +333,10 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
 //        echo json_encode($res);
 */
 
+        if($params["all"] == "false")
+            $status = " AND u.status = 1";
+        else
+            $status = "";
 
         $db = self::$instance->db;
         $results = $db->rawQuery('SELECT
@@ -363,7 +367,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                                     d.puerta,
                                     d.ciudad_id
                                 FROM usuarios u LEFT JOIN direcciones d ON d.usuario_id = u.usuario_id
-                                WHERE u.rol_id IN (' . $params["rol_id"] . ') ORDER BY u.apellido, u.nombre');
+                                WHERE u.rol_id IN (' . $params["rol_id"] . ')' . $status . ' ORDER BY u.apellido, u.nombre');
 
         $final = array();
         foreach ($results as $row) {

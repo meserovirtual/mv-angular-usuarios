@@ -30,6 +30,7 @@
         vm.update = false;
         vm.perfiles = [];
         vm.perfil = {};
+        vm.soloActivos = true;
 
         vm.save = save;
         vm.cancel = cancel;
@@ -93,11 +94,22 @@
         loadUsuarios();
 
         function loadUsuarios() {
-            UserVars.all = true;
-            UserService.get('0,1,4,5,6').then(function (data) {
-                //console.log(data);
-                setData(data);
-            });
+            UserVars.clearCache = true;
+            if (vm.soloActivos) {
+                UserVars.all = false;
+                UserService.get('0,1,4,5,6').then(function (data) {
+                    setData(data);
+                }).catch(function(error){
+                    console.log(error);
+                });
+            } else {
+                UserVars.all = true;
+                UserService.get('0,1,4,5,6').then(function (data) {
+                    setData(data);
+                }).catch(function(error){
+                    console.log(error);
+                });
+            }
         }
 
 

@@ -279,9 +279,8 @@
          */
         function get(rol_id) {
             MvUtilsGlobals.startWaiting();
-            //var urlGet = url + '?function=get';
-            //var urlGet = url + '?function=get&all=' + UserVars.all;
-            var urlGet = url + '?function=get&rol_id=' + rol_id;
+
+            var urlGet = url + '?function=get&rol_id=' + rol_id + '&all=' + UserVars.all;
             var $httpDefaultCache = $cacheFactory.get('$http');
             var cachedData = [];
 
@@ -680,7 +679,7 @@
         this.token_social = '';
 
         // Indica si debe traer todos los usuarios o solo los activos, por defecto, solo activos
-        this.all = false;
+        this.all = true;
         // Indica si se debe limpiar el cach� la pr�xima vez que se solicite un get
         this.clearCache = true;
 

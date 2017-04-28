@@ -6,8 +6,13 @@
                        placeholder="Buscar Usuario" style="width: 100%">
             </div>
         </div>
+        <div class="back-pedidos">
+            <label class="label--checkbox" ng-click="$ctrl.soloActivos=!$ctrl.soloActivos;$ctrl.loadUsuarios();">
+                <input type="checkbox" class="checkbox" id="check-soloActivos" ng-checked="$ctrl.soloActivos">Mostrar solo activos
+            </label>
+        </div>
 
-        <table>
+        <table style="margin-top: 15px">
             <thead>
             <tr>
                 <th>{{'NAME'|xlat}}</th>
