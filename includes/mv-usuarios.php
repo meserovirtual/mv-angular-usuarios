@@ -50,7 +50,7 @@ class Usuarios extends Main
         $authorizationHeader = isset($requestHeaders['Authorization']) ? $requestHeaders['Authorization'] : null;
         if ($authorizationHeader == null) {
             // tengo que generar la session y devolverla
-            $empty_user = array('id' => '', 'nombre' => '', 'apellido' => '', 'mail' => '', 'rol' => '');
+            $empty_user = array('id' => '', 'nombre' => '', 'apellido' => '', 'mail' => '', 'rol' => '', 'empresa_id' => getEmpresa());
             $session_id = generatePushId();
             $token = self::createTokenCliente($empty_user, $params["mesa_id"], $session_id);
         } else {
@@ -76,7 +76,7 @@ class Usuarios extends Main
 //        $movimientos = $db->rawQuery("select movimiento_id from detallesmovimientos where detalle_tipo_id = 3 and valor = ".$row["cliente_id"].");");
             $asientos = $db->rawQuery("select asiento_id, fecha, cuenta_id, sucursal_id, importe, movimiento_id, 0 detalles
 from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
-(select movimiento_id from detallesmovimientos where detalle_tipo_id = 3 and valor = " . $row["usuario_id"] . ");");
+(select movimiento_id from detallesmovimientos where detalle_tipo_id = 3 and valor = " . $row["usuario_id"] . " and empresa_id = " . getEmpresa() . ");");
 
             foreach ($asientos as $key_mov => $movimento) {
                 $detalles = $db->rawQuery("select detalle_tipo_id,
@@ -84,7 +84,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                                         (select concat(producto_id, ' - ' , nombre) from productos where producto_id = valor)
                                       when (detalle_tipo_id  != 8) then valor
                                       end valor from detallesmovimientos
-                                      where movimiento_id = (select movimiento_id from movimientos where cuenta_id like '4.1.1.%' and asiento_id=" . $movimento["asiento_id"] . ");");
+                                      where movimiento_id = (select movimiento_id from movimientos where cuenta_id like '4.1.1.%' and asiento_id=" . $movimento["asiento_id"] . " and empresa_id = " . getEmpresa() . ");");
                 $asientos[$key_mov]["detalles"] = $detalles;
             }
 
@@ -218,7 +218,8 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                 'sucursal_id' => $sucursal_id, // User name
                 'caja_id' => $caja_id, // User name
                 'rol' => $user["rol_id"], // Rol
-                'session_id' => $session_id // Session
+                'session_id' => $session_id, // Session
+                'empresa_id' => $user["empresa_id"] // Session
             ]
         ];
 
@@ -246,7 +247,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
         $aud = $serverName;
 //        $serverName = $config->get('serverName'); // Retrieve the server name from config file
 
-        if($session_id == ''){
+        if ($session_id == '') {
             $session_id = generatePushId();
         }
 
@@ -333,7 +334,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
 //        echo json_encode($res);
 */
 
-        if($params["all"] == "false")
+        if ($params["all"] == "false")
             $status = " AND u.status = 1";
         else
             $status = "";
@@ -367,7 +368,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                                     d.puerta,
                                     d.ciudad_id
                                 FROM usuarios u LEFT JOIN direcciones d ON d.usuario_id = u.usuario_id
-                                WHERE u.rol_id IN (' . $params["rol_id"] . ')' . $status . ' ORDER BY u.apellido, u.nombre');
+                                WHERE u.rol_id IN (' . $params["rol_id"] . ')' . $status . ' and u.empresa_id = ' . getEmpresa() . '  ORDER BY u.apellido, u.nombre');
 
         $final = array();
         foreach ($results as $row) {
@@ -456,7 +457,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
 //        $db->join("direcciones d", "d.usuario_id=u.usuario_id", "LEFT");
 //        $results = $db->get("usuarios u");
 
-        $results = $db->rawQuery('SELECT u.usuario_id, u.nombre, apellido, mail, rol_id, password, tipo_doc, nro_doc, marcado, saldo, social_login, status FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = "' . $params['mail'] . '"');
+        $results = $db->rawQuery('SELECT u.usuario_id, u.nombre, apellido, mail, rol_id, password, tipo_doc, nro_doc, marcado, saldo, social_login, status, u.empresa_id FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = "' . $params['mail'] . '"');
 
 
         global $jwt_enabled;
@@ -517,7 +518,7 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
 //        $db->join("direcciones d", "d.usuario_id=u.usuario_id", "LEFT");
 //        $results = $db->get("usuarios u");
 
-        $results = $db->rawQuery('SELECT u.usuario_id, u.nombre, apellido, mail, rol_id, password, tipo_doc, nro_doc, marcado, saldo, social_login, status FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = "' . $params['mail'] . '"');
+        $results = $db->rawQuery('SELECT u.usuario_id, u.nombre, apellido, mail, rol_id, password, tipo_doc, nro_doc, marcado, saldo, social_login, status, u.empresa_id FROM usuarios u LEFT JOIN direcciones d on d.usuario_id=u.usuario_id WHERE  mail = "' . $params['mail'] . '"');
 
 
         global $jwt_enabled;
@@ -699,7 +700,8 @@ from movimientos where cuenta_id like '1.1.2.%' and movimiento_id in
                 'cbu' => $user_decoded->cbu,
                 'social_login' => $user_decoded->social_login,
                 'status' => $user_decoded->status,
-                'cta_cte' => $user_decoded->cta_cte
+                'cta_cte' => $user_decoded->cta_cte,
+                'empresa_id' => getEmpresa()
             );
 
             $result = $db->insert('usuarios', $data);
